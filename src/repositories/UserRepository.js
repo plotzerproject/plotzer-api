@@ -26,28 +26,35 @@ class UserRepository {
         const user = await User.findById(id)
         return user
     }
-    // async update(id, data) {
-    //     const user = await User.findByIdAndUpdate(id, data)
-    //     return user
-    // }
-    // async destroy(id) {
-    //     const user = await User.findByIdAndDelete(id)
-    //     return user
-    // }
+    async update(id, data) {
+        const user = await User.findByIdAndUpdate(id, data)
+        return user
+    }
+    async destroy(id) {
+        const user = await User.findByIdAndDelete(id)
+        return user
+    }
 
-    // async getMyTeams(id_user) {
-    //     const user = await this.find(id_user)
-    //     if(!user) return null
-    //     if(!user.teams) return false
-    //     return user.teams
-    // }
+    async getMyTeams(id_user) {
+        // const user = await this.find(id_user)
+        // User.findOne({_id: id_user})
+        try {
+            const user = await User.findOne({_id: id_user}).populate("teams")
+            if(!user) return null
+            if(!user.teams) return false
+            return user.teams
+        } catch (error) {
+            console.log(error)            
+        }
 
-    // async addMember(id_member, team_data) {
-    //     const user = await User.findById(id_member)
-    //     user.teams.push(team_data)
-    //     await user.save()
-    //     return user
-    // }
+    }
+
+    async addMember(id_member, team_id) {
+        const user = await User.findById(id_member)
+        user.teams.push(team_id)
+        await user.save()
+        return user
+    }
 
     // async removeMember(id_member, id_team) {
     //     const user = await User.findById(id_member)

@@ -14,6 +14,7 @@ import {
 import { userSuccessReturnToken } from "../utils/returns.js";
 import { CreateSession } from "../services/SessionService.js";
 import { RefreshTokenService } from "../services/RefreshTokenService.js";
+import mongoose from "mongoose";
 
 class AuthController {
   async create(req, res, next) {
@@ -49,6 +50,10 @@ class AuthController {
       //       .json({ error: "Error on validate user schema." });
       //   }
 
+      plan = {
+        id: mongoose.Types.ObjectId(plan)
+      }
+
       //create user
       const user = await UserRepository.create(
         name,
@@ -69,6 +74,7 @@ class AuthController {
         .status(200)
         .json({ data: userSuccessReturnToken(user, token) });
     } catch (error) {
+      console.log(error)
       if (error.message == "token") {
         return res
           .status(errCreateToken.status)
@@ -119,9 +125,11 @@ class AuthController {
     try {
       const token = req.body.refresh_token;
 
-      const refresh_token_service = new RefreshTokenService();
+      const refresh_token_service = new RefreshTokenService(); 
 
       const refresh_token_response = await refresh_token_service.execute(token);
+
+      console.log('refresh token response authcontroller', refresh_token_response)
 
       return res.status(201).json(refresh_token_response);
     } catch (error) {

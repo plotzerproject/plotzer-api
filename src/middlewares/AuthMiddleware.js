@@ -14,7 +14,6 @@ const verifyAuthentication = async (req, res, next) => {
     return res.status(errNeedsToken.status).json({ errors: [errNeedsToken] });
 
   const [, token] = authToken.split(" ");
-
   if (!token)
     return res.status(errNeedsToken.status).json({ errors: [errNeedsToken] });
 
@@ -28,7 +27,6 @@ const verifyAuthentication = async (req, res, next) => {
     res.locals.user = user;
     next();
   } catch (error) {
-    console.log(error.message);
     if (error.message === "jwt expired") {
       return res.status(errTokenInvalid.status).json({ errors: [errTokenInvalid]});
     } else if (error.message == "jwt must be provided") {

@@ -38,7 +38,7 @@ export const errDeleteUser = new Errors().createError("Falha na requisição", "
 
 export const errUserNotFound = new Errors().createError("Falha na requisição", "Nenhum usuário foi encontrado", 404)
 
-export const errUserAlreadyExists = new Errors().createError("Falha na requisição", "Este e-mail ja está cadastrado.", 500)
+export const errUserAlreadyExists = new Errors().createError("ERR_USER_EXISTS", "Este e-mail ja está cadastrado.", 500)
 
 export const errUserIncorrect = new Errors().createError("Valores Inválidos", "E-mail ou senha incorretos!", 404)
 

@@ -1,54 +1,60 @@
 import mongoose from "mongoose";
 
-const teamsSchema = new mongoose.Schema({
+const planSchema = new mongoose.Schema(
+  {
     id: {
-        type: mongoose.Types.ObjectId,
-        required: true
-    },
-}, {
-    _id: false
-})
-
-const planSchema = new mongoose.Schema({
-    id: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: "Plan"
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Plan",
     },
     purchaseDate: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
     active: {
-        type: Boolean,
-        default: true
-    }
-}, {
-    _id: false
-})
+      type: Boolean,
+      default: true,
+    },
+  },
+  {
+    _id: false,
+  }
+);
 
-const schema = new mongoose.Schema({
+const schema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     email: {
-        type: String,
-        required: true,
-        unique: true
+      type: String,
+      required: true,
+      unique: true,
     },
     password: {
-        type: String
+      type: String,
     },
     plan: planSchema,
     photo: {
-        type: String
+      type: String,
     },
-    teams: [teamsSchema],
+    teams: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Team",
+      },
+    ],
     applicationPermissions: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
-})
+  },
+  {
+    toJSON: {
+      virtuals: true,
+    },
+  }
+);
 
-export default mongoose.model("User", schema)
+export default mongoose.model("User", schema);
