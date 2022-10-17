@@ -18,7 +18,7 @@ import multerConfig from '../config/multer.js'
 
 //routes
 routes.use("/auth", authenticate)
-routes.use("/user", user)
+routes.use("/user", verifyAuthentication, user)
 routes.use("/plan", plan)
 routes.use("/team", verifyAuthentication, team)
 

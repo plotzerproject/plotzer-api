@@ -58,45 +58,58 @@ export const errDeletePlan = new Errors().createError("Falha na requisição", "
 export const errPlanNotFound = new Errors().createError("Falha na requisição", "Nenhum plano foi encontrado", 404)
 
 //Team
-export const errCreateTeam = new Errors().createError("Falha no cadastro", "Um erro ocorreu ao cadastrar esta equipe", 500)
+export const errCreateTeam = new Errors().createError("ERR_CREATE_TEAM", "Um erro ocorreu ao cadastrar esta equipe", 500)
 
-export const errGetTeam = new Errors().createError("Falha na requisição", "Ocorreu um erro ao receber a(s) equipe(s)", 500)
+export const errGetTeam = new Errors().createError("ERR_GET_TEAM", "Ocorreu um erro ao receber a(s) equipe(s)", 500)
 
-export const errUpdateTeam = new Errors().createError("Falha na requisição", "Um erro ocorreu ao editar uma equipe", 500)
+export const errUpdateTeam = new Errors().createError("ERR_UPDATE_TEAM", "Um erro ocorreu ao editar uma equipe", 500)
 
-export const errDeleteTeam = new Errors().createError("Falha na requisição", "Um erro ocorreu ao deletar uma equipe", 500)
+export const errDeleteTeam = new Errors().createError("ERR_DELETE_TEAM", "Um erro ocorreu ao deletar uma equipe", 500)
 
-export const errTeamNotFound = new Errors().createError("Falha na requisição", "Nenhuma equipe foi encontrada", 404)
+export const errTeamNotFound = new Errors().createError("ERR_TEAM_NOT_FOUND", "Nenhuma equipe foi encontrada", 404)
 
-export const errUserLimitTeams = new Errors().createError("Falha no cadastro", "O Usuário ja esgotou seu limite de equipes", 404)
+export const errUserLimitTeams = new Errors().createError("ERR_USER_LIMIT_TEAMS", "O Usuário ja esgotou seu limite de equipes", 404)
 
-export const errAddMemberTeam = new Errors().createError("Falha na requisição", "ocorreu um erro ao adicionar este membro na equipe!", 500)
+export const errAddMemberTeam = new Errors().createError("ERR_ADD_MEMBER", "ocorreu um erro ao adicionar este membro na equipe!", 500)
 
-export const errUserIsntOnTheTeam = new Errors().createError("Dados Inválidos", "Este usuário não se encontra nesta equipe ou não existe, digite novamente!", 422)
+export const errUserIsntPartOfTeam = new Errors().createError("ERR_USER_IS_NOT_PART_OF_TEAM", "Este usuário não se encontra nesta equipe ou não existe, digite novamente!", 422)
 
-export const errUserDontHaveATeam = new Errors().createError("Dados Inválidos", "Este usuário não faz parte de nenhuma equipe!", 422)
+export const errUserDontHaveATeam = new Errors().createError("ERR_USER_DOES_NOT_HAVE_TEAM", "Este usuário não faz parte de nenhuma equipe!", 422)
 
-export const errRemoveMemberTeam = new Errors().createError("Falha na requisição", "ocorreu um erro ao remover este membro na equipe!", 500)
+export const errRemoveMemberTeam = new Errors().createError("ERR_REMOVE_MEMBER", "ocorreu um erro ao remover este membro na equipe!", 500)
 
-export const errLeaveTeam = new Errors().createError("Request Failed", "Ocorreu um erro ao sair da equipe!", 500)
+export const errLeaveTeam = new Errors().createError("ERR_LEAVE_TEAM", "Ocorreu um erro ao sair da equipe!", 500)
 
-export const errUserIsAlreadyInTheTeam = new Errors().createError("Invalid Data", "Este usuário ja se encontra na equipe, adicione outro!", 422)
+export const errTeamRequestFailed = new Errors().createError("ERR_TEAM_REQUEST", "Ocorreu um erro ao prosseguir com a requisição!", 500)
 
+export const errUserIsAlreadyInTheTeam = new Errors().createError("ERR_USER_IN_TEAM", "Este usuário ja se encontra na equipe, adicione outro!", 422)
+
+export const errUserAlreadyInvited = new Errors().createError("ERR_ALREADY_INVITED", "Este usuário já foi convidado anteriormente!", 422)
+
+// export const errUserDidntAccepted = new Errors().createError("ERR_USER_DID_NOT_ACCEPTED", "Este usuario ainda não aceitou o convite!", 422)
+
+export const errUserDoesntHavePermission = new Errors().createError("ERR_USER_PERMISSIONS", "Este usuário não possui permissão para fazer isto!", 401)
+
+export const errUserIsntOnTheTeam = new Errors().createError("ERR_USER_IS_NOT_TEAM", "Este usuário não faz parte da equipe!", 401)
+
+export const errSlugAlreadyExists = new Errors().createError("ERR_SLUG_EXISTS", "Este slug ja está cadastrado.", 500)
 
 //Token
-export const errNeedsToken = new Errors().createError("Token is missing", "Insira um token para prosseguir", 401)
+export const errNeedsToken = new Errors().createError("ERR_NEEDS_TOKEN", "Insira um token para prosseguir", 401)
 
-export const errUserTokenNotFound = new Errors().createError("Falha na requisição", "Usuário ou Token não encontrado", 404)
+export const errUserTokenNotFound = new Errors().createError("ERR_USER_TOKEN_NOT_FOUND", "Usuário ou Token não encontrado", 404)
 
-export const errTokenInvalid = new Errors().createError("Invalid Token", "Este token ja expirou ou não existe, tente logar novamente!", 401)
+export const errTokenInvalid = new Errors().createError("ERR_TOKEN_INVALID", "Este token ja expirou ou não existe, tente logar novamente!", 401)
 
-export const errCreateToken = new Errors().createError("Falha na requisição", "Ocorreu um erro ao criar seu token!", 500)
+export const errCreateToken = new Errors().createError("ERR_CREATE_TOKEN", "Ocorreu um erro ao criar seu token!", 500)
 
-export const errLogIn = new Errors().createError("Falha na requisição", "Ocorreu um erro ao realizar o login!", 500)
+export const errLogIn = new Errors().createError("ERR_LOGIN", "Ocorreu um erro ao realizar o login!", 500)
 
 //Transaction
 
 //Application
-export const errUnauthorized = new Errors().createError("Falha na requisição", "Sem autorização!", 401)
+export const errUnauthorized = new Errors().createError("ERR_UNAUTHORIZED", "Sem autorização!", 401)
 
-export const errApplication = new Errors().createError("Falha na requisição", "Ocorreu um erro ao processar sua requisição", 500)
+export const errApplication = new Errors().createError("ERR_APPLICATION", "Ocorreu um erro ao processar sua requisição", 500)
+
+export const errInvalidData = new Errors().createError("ERR_INVALID_DATA", "Existem campos em branco", 422)

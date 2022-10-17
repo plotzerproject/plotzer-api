@@ -1,8 +1,8 @@
 import User from "../model/User.js";
 
 class UserRepository {
-    async create(name, email, password, plan, photo, teams, applicationPermissions) {
-        const user = await User.create({ name, email, password, plan, photo, teams, applicationPermissions })
+    async create(name, email, password, plan, photo, background, applicationPermissions, teams) {
+        const user = await User.create({ name, email, password, plan, photo, background, teams, applicationPermissions })
         await user.save()
         return user;
     }
@@ -13,7 +13,7 @@ class UserRepository {
     async verifyEmail(email) {
         const user = await User.findOne({ email })
         if (user) {
-            return true
+            return user
         } else {
             return false
         }
@@ -35,7 +35,7 @@ class UserRepository {
         return user
     }
 
-    async getMyTeams(id_user) {
+    async getUserTeams(id_user) {
         // const user = await this.find(id_user)
         // User.findOne({_id: id_user})
         try {
@@ -49,24 +49,32 @@ class UserRepository {
 
     }
 
-    async addMember(id_member, team_id) {
-        const user = await User.findById(id_member)
-        user.teams.push(team_id)
-        await user.save()
-        return user
+    async addMember(id_team, id_member) {
+        try {
+            const user = await User.findById(id_member)
+            user.teams.push(id_team)
+            await user.save()
+            return user
+        } catch (error) {
+            throw new Error(error.message)            
+        }
     }
 
-    // async removeMember(id_member, id_team) {
-    //     const user = await User.findById(id_member)
-    //     if (!user) return null
-    //     let teams = user.teams.findIndex((team) => {
-    //         return team.id.toString() === id_team
-    //     })
-    //     if(!teams) return undefined
-    //     user.teams.splice(teams,1)
-    //     await user.save()
-    //     return user
-    // }
+    async removeMember(id_team, id_member) {
+        try {
+            const user = await User.findById(id_member);
+            if (!user) throw new Error("ERR_USER_NOT_FOUND");
+            let teams = user.teams.findIndex((team) => {
+                return team.toString() === id_team
+            })
+            if (!teams < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
+            user.teams.splice(teams, 1)
+            await user.save()
+            return user;
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
 }
 
 export default new UserRepository()

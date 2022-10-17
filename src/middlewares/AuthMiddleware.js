@@ -12,7 +12,6 @@ const verifyAuthentication = async (req, res, next) => {
     req.headers.authorization || req.body.token || req.query.token;
   if (!authToken)
     return res.status(errNeedsToken.status).json({ errors: [errNeedsToken] });
-
   const [, token] = authToken.split(" ");
   if (!token)
     return res.status(errNeedsToken.status).json({ errors: [errNeedsToken] });

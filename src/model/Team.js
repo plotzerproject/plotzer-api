@@ -25,10 +25,28 @@ const memberSchema = new mongoose.Schema({
     type_invite: {
         type: String,
         required: true,
-        enum: ['requested', 'invited', 'owner']
+        enum: ['requested', 'invited', 'owner', 'blocked']
     }
 }, {
     _id: false
+})
+
+const fixedSchema = new mongoose.Schema({
+    author: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: "User"
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    content: {
+        type: String,
+        required: true
+    }
+}, {
+    timestamps: true
 })
 
 const schema = new mongoose.Schema({
@@ -59,13 +77,17 @@ const schema = new mongoose.Schema({
         default: "open",
         enum: ['open', 'closed', 'only-invites']
     },
-    photo: {
-        type: String
-    },
+    photo: String,
+    background: String,
     members: [memberSchema],
     active: {
         type: Boolean,
         default: true
+    },
+    fixed: [fixedSchema],
+    stats: {
+        type: Number,
+        default: 100
     }
 }, {
     toJSON: {

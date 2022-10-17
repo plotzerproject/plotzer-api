@@ -1,3 +1,5 @@
+//plan
+
 export const planSuccessReturn = (plan) => {
     const data = {
         type: "plan",
@@ -9,18 +11,19 @@ export const planSuccessReturn = (plan) => {
             permissions: plan.permissions,
         },
         links: {
-            self: "/api/v1/plan/" + plan.id
+            self: "/api/plan/" + plan.id
         }
     }
     return data
 }
+
+//user
 
 export const getMembersReturn = (member, id_team) => {
     const data = {
         type: "team members",
         id: member.id,
         attributes: {
-            id: member.id,
             name: member.name,
             email: member.email,
             tag: member.tag,
@@ -30,38 +33,7 @@ export const getMembersReturn = (member, id_team) => {
             type_invite: member.type_invite
         },
         links: {
-            self: "/api/v1/team/"+id_team+"/members/" + member.id
-        }
-    }
-    return data
-}
-
-export const teamSuccessReturn = (team)=> {
-    const data = {
-        type: "team",
-        id: team.id,
-        attributes: {
-            name: team.name,
-            owner: team.owner,
-            cnpj: team.cnpj,
-            plan: team.plan,
-            photo: team.photo,
-            members: team.members?.map((user)=>(
-                {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    tag: user.tag ? user.tag : "Membro",
-                    userPermissions: user.userPermissions,
-                    reputation: user.reputation ? user.reputation : 100,
-                    member_active: user.member_active,
-                    type_invite: user.type_invite
-                }
-            )),
-            active: team.active,
-        },
-        links: {
-            self: "/api/v1/team/" + team.id
+            self: "/api/team/"+id_team+"/members/" + member.id
         }
     }
     return data
@@ -80,19 +52,12 @@ export const userSuccessReturn = (user) => {
                 active: user.plan?.active ? user.plan?.active : true
             },
             photo: user.photo,
-            teams: user.teams?.map((team)=>(
-                {
-                    id: team.id,
-                    name: team.name,
-                    owner: team.owner,
-                    userPermissions: team.userPermissions,
-                    tag: team.tag ? team.tag : "Membro"
-                }
-            )),
+            background: user.background,
+            teams: `GET /api/user/get/${user.id}/teams`,
             applicationPermissions: user.applicationPermissions
         },
         links: {
-            self: "/api/v1/user/" + user.id
+            self: "/api/user/" + user.id
         }
     }
     return data
@@ -107,23 +72,16 @@ export const userSuccessReturnToken = (user, tokens) => {
             email: user.email,
             plan: {
                 id: user.plan?.id,
-                purchaseDate: user.plan?.purchaseDate,
-                active: user.plan?.active
+                purchaseDate: user.plan?.purchaseDate, //getdate dps!!
+                active: user.plan?.active ? user.plan?.active : true
             },
             photo: user.photo,
-            teams: user.teams?.map((team)=>(
-                {
-                    id: team.id,
-                    name: team.name,
-                    owner: team.owner,
-                    userPermissions: team.userPermissions,
-                    tag: team.tag
-                }
-            )),
+            background: user.background,
+            teams: `GET /api/user/get/${user.id}/teams`,
             applicationPermissions: user.applicationPermissions
         },
         links: {
-            self: "/api/v1/user/" + user.id
+            self: "/api/user/" + user.id
         },
         tokens: {
             token: tokens.token,
@@ -132,3 +90,48 @@ export const userSuccessReturnToken = (user, tokens) => {
     }
     return data
 }
+
+//team
+
+export const teamSuccessReturn = (team)=> {
+    const data = {
+        type: "team",
+        id: team.id,
+        attributes: {
+            name: team.name,
+            owner: team.owner,
+            plan: team.plan,
+            photo: team.photo,
+            background: team.background,
+            members: `GET /api/team/${team.id}/members`,
+            active: team.active,
+            stats: `${team.stats}%`,
+            fixed: `GET /api/team/${team.id}/fixed`,
+            slug: team.slug
+        },
+        links: {
+            self: "/api/team/" + team.id
+        }
+    }
+    return data
+}
+
+export const getTeamFixed = (fixed) => {
+    const data = {
+        type: "team-fixed",
+        id: fixed.id,
+        attributes: {
+            author: fixed.author,
+            title: fixed.title,
+            content: fixed.content,
+            createdAt: fixed.createdAt,
+            updatedAt: fixed.updatedAt,
+        },
+        links: {
+            self: "/api/team/" + fixed.id_team + "/fixed/"+fixed.id
+        }
+    }
+    return data
+}
+
+export const getTeamMembers = () => {}

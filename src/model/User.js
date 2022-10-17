@@ -36,9 +36,8 @@ const schema = new mongoose.Schema(
       type: String,
     },
     plan: planSchema,
-    photo: {
-      type: String,
-    },
+    photo: String,
+    background: String,
     teams: [
       {
         type: mongoose.Types.ObjectId,

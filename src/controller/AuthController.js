@@ -16,6 +16,8 @@ import { CreateSession } from "../services/SessionService.js";
 import { RefreshTokenService } from "../services/RefreshTokenService.js";
 import mongoose from "mongoose";
 
+export const salt = await bcrypt.genSalt(12);
+
 class AuthController {
   async create(req, res, next) {
     let { name, email, password, plan, photo, teams, applicationPermissions } =
