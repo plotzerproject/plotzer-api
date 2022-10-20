@@ -179,7 +179,7 @@ class UserController {
     if (res.locals.id) id = res.locals.id;
 
     try {
-      const teams = await UserRepository.getUserTeams(id);
+      const teams = await UserRepository.getUserTeamsPopulate(id);
       if (teams == null)
         return res
           .status(errUserNotFound.status)

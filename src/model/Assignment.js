@@ -1,46 +1,49 @@
 import mongoose from "mongoose";
 
 const date = new Date();
-date.setDays(date.getDays() + 1);
+date.setDate(date.getDate() + 1);
 
-const schema = new mongoose.Schema({
+const schema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    description: {
+    description: String,
+    category: String,
+    userAttachments: [
+      {
         type: String,
-        required: true
-    },
-    category: {
-        type: String,
-        required: true
-    },
-    myAttachments: [
-        {
-            type: String
-        }
+      },
     ],
     assignmentAttachments: [
-        {
-            type: String
-        }
+      {
+        type: String,
+      },
     ],
     team: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: "Team"
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Team",
     },
     author: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: "User"
-    },//quem fez
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "User",
+    }, //quem fez
     dateLimit: {
-        type: Date,
-        required: true,
-        default: date.getTime()
-    }
-})
+      type: Date,
+      required: true,
+      default: date,
+    },
+    users: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserAssignment",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.model("Assignment", schema)
+export default mongoose.model("Assignment", schema);

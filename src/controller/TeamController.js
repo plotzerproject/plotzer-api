@@ -59,9 +59,9 @@ class TeamController {
         }
     };
     async find(req, res, next) { //ok
-        const { id } = req.params
+        const { id_team } = req.params
         try {
-            const team = await TeamRepository.find({ _id: id });
+            const team = await TeamRepository.find({ _id: id_team });
             if (team == null) return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
 
             return res.status(200).json({ data: teamSuccessReturn(team) })

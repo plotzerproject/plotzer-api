@@ -39,6 +39,19 @@ class UserRepository {
         // const user = await this.find(id_user)
         // User.findOne({_id: id_user})
         try {
+            const user = await User.findOne({_id: id_user})
+            if(!user) return null
+            if(!user.teams) return false
+            return user.teams
+        } catch (error) {
+            console.log(error)            
+        }
+    }
+
+    async getUserTeamsPopulate(id_user) {
+        // const user = await this.find(id_user)
+        // User.findOne({_id: id_user})
+        try {
             const user = await User.findOne({_id: id_user}).populate("teams")
             if(!user) return null
             if(!user.teams) return false
@@ -46,7 +59,6 @@ class UserRepository {
         } catch (error) {
             console.log(error)            
         }
-
     }
 
     async addMember(id_team, id_member) {

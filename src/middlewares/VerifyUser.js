@@ -36,7 +36,7 @@ const verifyPermissions = async (req, res, next) =>{
 }
 
 const verifyUserOnTeam = async (req, res, next) => {
-    const {id_team} = req.params;
+    const id_team = req.params.id_team || req.body.id_team;
 
     if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 
@@ -54,7 +54,7 @@ const verifyUserOnTeam = async (req, res, next) => {
 }
 
 const verifyUserHasPermissions = async (req, res, next) => {
-    const {id_team} = req.params;
+    const id_team = req.params.id_team || req.body.id_team;
 
     if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 

@@ -135,3 +135,28 @@ export const getTeamFixed = (fixed) => {
 }
 
 export const getTeamMembers = () => {}
+
+//Assignments
+export const AssignmentReturn = (assignment) => {
+    console.log(assignment)
+    const data = {
+        type: "assignment",
+        id: assignment.id,
+        attributes: {
+            title: assignment.title,
+            author: assignment.author,
+            description: assignment.description,
+            team: assignment.team,
+            dateLimit: assignment.dateLimit,
+            userAttachments: assignment.userAttachments,
+            assignmentAttachments: assignment.assignmentAttachments,
+            createdAt: assignment.createdAt,
+            updatedAt: assignment.updatedAt,
+            users: assignment.users
+        },
+        links: {
+            self: "/api/assignment/" + assignment.id_team
+        }
+    }
+    return data
+}
