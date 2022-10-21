@@ -12,7 +12,6 @@ import {
   verifyUserHasPermissions,
   verifyUserOnTeam,
 } from "../middlewares/VerifyUser.js";
-import UserAssignmentRepository from "../repositories/UserAssignmentRepository.js";
 const upload = multer(multerConfig);
 
 routes.post(
@@ -24,11 +23,12 @@ routes.post(
   },
   verifyUserHasPermissions,
   AssignmentController.create
-);
-routes.get("/", verifyPermissions, AssignmentController.get);
-routes.get("/:id", verifyUserOnTeam, AssignmentController.find);
+);//criar
+routes.get("/", verifyPermissions, AssignmentController.get);//receber todas
+routes.get("/:id_team/data/:id", verifyUserOnTeam, AssignmentController.find);//receber dados
+routes.get("/:id_team/members/:id", verifyUserOnTeam, AssignmentController.getAssignmentUsers);//receber dados com os usuarios
 routes.put(
-  "/:id",
+  "/:id_team/:id",
   (req, res, next) => {
     res.locals.permission = teamPermissions.moderator;
     res.locals.permissionApp = false;
@@ -36,7 +36,7 @@ routes.put(
   },
   verifyUserHasPermissions,
   AssignmentController.update
-);
+);//atualizar
 routes.delete(
   "/:id",
   (req, res, next) => {
@@ -48,10 +48,7 @@ routes.delete(
   AssignmentController.destroy
 );
 
-routes.get("/teste/a", async (req, res)=>{
-    const a = await UserAssignmentRepository.get()
-    res.send(a)
-});
+routes.get("/user/:id", verifyPermissions, AssignmentController.getUserAssignments);
 routes.get("/@me/my-assignments", AssignmentController.me, AssignmentController.getUserAssignments);
 routes.post(
   "/@me/complete-assignment",

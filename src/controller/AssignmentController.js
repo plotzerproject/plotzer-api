@@ -1,8 +1,8 @@
 import AssignmentRepository from "../repositories/AssignmentRepository.js";
 import TeamRepository from "../repositories/TeamRepository.js";
 import UserAssignmentRepository from "../repositories/UserAssignmentRepository.js";
-import { errApplication, errInvalidData } from "../utils/errors.js";
-import { AssignmentReturn } from "../utils/returns.js";
+import { errApplication, errAssignmentNotFound, errGetAssignment, errInvalidData, errUserNotFound } from "../utils/errors.js";
+import { AssignmentReturn, UserAssignmentReturn } from "../utils/returns.js";
 
 class AssignmentController {
     async me(req, res, next) { //ok
@@ -53,16 +53,40 @@ class AssignmentController {
     }
     async update(req, res, next) {}
     async destroy(req, res, next) {}
+
     async getUserAssignments(req, res, next) {
+        const id = req.params.id || res.locals.id || req.body.id
+        
+        if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+
         try {
-            const a = await UserAssignmentRepository.getUserAssignments(res.locals.id)
-            res.send(a)
+            const assignments = await UserAssignmentRepository.getUserAssignments(id)
+            if(!assignments) return res.status(errApplication.status).json({errors: [errApplication]})
+            else if(assignments.length <= 0) return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
+
+            return res.status(200).json({data: assignments.map(UserAssignmentReturn)})
         } catch (error) {
-            console.log(error)
+            return res.status(errApplication.status).json({errors: [errApplication]})
         }
     }
     async completeAssignment(req, res, next) {
 
+    }
+
+    async getAssignmentUsers(req, res, next) {
+        const id = req.params.id
+        try {
+            const assignment = await AssignmentRepository.getAssignmentUsers(id)
+            // if(assignments == null) return res.status(errApplication.status).json({errors: [errApplication]})
+            return res.status(200).json({data: AssignmentReturn(assignment)})
+        } catch (error) {
+            if(error.message == "ERR_USER_NOT_FOUND") {
+                return res.status(errUserNotFound.status).json({errors: [errUserNotFound]})
+            } else if(error.message == "ERR_ASSIGNMENT_NOT_FOUND") {
+                return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
+            }
+            return res.status(errGetAssignment.status).json({errors: [errGetAssignment]})
+        }
     }
 }
 

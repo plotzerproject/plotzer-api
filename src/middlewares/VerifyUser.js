@@ -69,6 +69,7 @@ const verifyUserHasPermissions = async (req, res, next) => {
                 return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
             }
         }
+        res.locals.id = id_team
         res.locals.team = team
         res.locals.member = member
         next()

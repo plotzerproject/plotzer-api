@@ -22,6 +22,18 @@ class AssignmentRepository{
         const assignment = await Assignment.findByIdAndDelete(id)
         return assignment
     }
+    async getAssignmentUsers(id){
+        try {
+            const assignments = await Assignment.findById(id).populate("users")
+            console.log(assignments)
+            if(assignments == undefined) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
+            if(assignments == null) throw new Error("ERR_USER_NOT_FOUND")
+            // if(assignments == null) throw new Error("ERR_USER_NOT_FOUND")
+            return assignments
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
 }
 
 export default new AssignmentRepository()

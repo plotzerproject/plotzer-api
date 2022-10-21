@@ -160,3 +160,32 @@ export const AssignmentReturn = (assignment) => {
     }
     return data
 }
+
+export const UserAssignmentReturn = (userAssignment) => {
+    const data = {
+        type: "user-assignment",
+        id: userAssignment.id,
+        attributes: {
+            team: userAssignment.team,
+            createdAt: userAssignment.createdAt,
+            updatedAt: userAssignment.updatedAt,
+
+            assignment: {
+                id: userAssignment.assignment.id,
+                title: userAssignment.assignment.title,
+                author: userAssignment.assignment.author,
+                description: userAssignment.assignment.description,
+                team: userAssignment.assignment.team,
+                dateLimit: userAssignment.assignment.dateLimit,
+                userAttachments: userAssignment.assignment.userAttachments,
+                assignmentAttachments: userAssignment.assignment.assignmentAttachments,
+                createdAt: userAssignment.assignment.createdAt,
+                updatedAt: userAssignment.assignment.updatedAt,
+            }
+        },
+        links: {
+            self: "/api/assignment/" + userAssignment.id
+        }
+    }
+    return data
+}

@@ -8,7 +8,7 @@ class UserAssignmentRepository{
         return assignments
     }
     async get() {
-        const assignments = await UserAssignment.find({})
+        const assignments = await UserAssignment.find({}).populate("users")
         return assignments
     }
     async find(id) {
@@ -25,7 +25,7 @@ class UserAssignmentRepository{
     }
     async getUserAssignments(id) {
         try {
-            const assignments = await UserAssignment.find({ 'users.user': id })
+            const assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment")
             return assignments
 
         } catch (error) {

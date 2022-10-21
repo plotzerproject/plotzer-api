@@ -29,7 +29,11 @@ routes.put(
   ]),
   TeamController.update
 );
-routes.delete("/:id_team", verifyUserOnTeam, TeamController.destroy);
+routes.delete("/:id_team",   (req, res, next) => {
+  res.locals.permission = teamPermissions.owner;
+  next();
+},
+verifyUserHasPermissions, TeamController.destroy);
 
 routes.post(
   "/:id_team/fixed/",
@@ -40,7 +44,7 @@ routes.post(
   verifyUserHasPermissions,
   TeamController.addFixed
 ); //arrumar o middleware de permissão
-routes.get("/:id_team/fixed/", TeamController.getFixed);
+routes.get("/:id_team/fixed/", verifyUserOnTeam, TeamController.getFixed);
 
 routes.get("/:id_team/members", verifyUserOnTeam, TeamController.getMembers);
 routes.get(

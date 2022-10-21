@@ -36,7 +36,7 @@ export const errUpdateUser = new Errors().createError("Falha na requisição", "
 
 export const errDeleteUser = new Errors().createError("Falha na requisição", "Um erro ocorreu ao deletar um usuário", 500)
 
-export const errUserNotFound = new Errors().createError("Falha na requisição", "Nenhum usuário foi encontrado", 404)
+export const errUserNotFound = new Errors().createError("ERR_USER_NOT_FOUND", "Nenhum usuário foi encontrado", 404)
 
 export const errUserAlreadyExists = new Errors().createError("ERR_USER_EXISTS", "Este e-mail ja está cadastrado.", 500)
 
@@ -105,7 +105,16 @@ export const errCreateToken = new Errors().createError("ERR_CREATE_TOKEN", "Ocor
 
 export const errLogIn = new Errors().createError("ERR_LOGIN", "Ocorreu um erro ao realizar o login!", 500)
 
-//Transaction
+//Assignments
+export const errCreateAssignment = new Errors().createError("ERR_CREATE_ASSIGNMENT", "Um erro ocorreu ao cadastrar esta tarefa", 500)
+
+export const errGetAssignment = new Errors().createError("ERR_GET_ASSIGNMENT", "Ocorreu um erro ao receber a(s) tarefas(s)", 500)
+
+export const errUpdateAssignment = new Errors().createError("ERR_UPDATE_ASSIGNMENT", "Um erro ocorreu ao editar uma tarefas", 500)
+
+export const errDeleteAssignment = new Errors().createError("ERR_DELETE_ASSIGNMENT", "Um erro ocorreu ao deletar uma tarefa", 500)
+
+export const errAssignmentNotFound = new Errors().createError("ERR_ASSIGNMENT_NOT_FOUND", "Nenhuma tarefa foi encontrada", 404)
 
 //Application
 export const errUnauthorized = new Errors().createError("ERR_UNAUTHORIZED", "Sem autorização!", 401)

@@ -121,7 +121,7 @@ class TeamController {
     };
 
     async destroy(req, res, next) { //preguiça de testar
-        const { id } = req.params
+        const id = res.locals.id || req.params.id_team
         if (id == null) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
 
         try {
