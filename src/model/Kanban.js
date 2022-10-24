@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const topicsSchema = new mongoose.Schema({
-    user: {
+    author: {
         type: mongoose.Types.ObjectId,
         ref: "User",
         required: true
@@ -10,18 +10,14 @@ const topicsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    isAssignment: {
-        type: Boolean,
-        default: false
-    },
-    dateLimit: Date,
+    title: String,
     color: String
 }, {
     timestamps: true
 })
 
 const schema = new mongoose.Schema({
-    author: {
+    owner: {
         type: mongoose.Types.ObjectId,
         ref: "User",
         required: true
@@ -30,6 +26,7 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
+    subtitle: String,
     topics: [topicsSchema],
     team: {
         type: mongoose.Types.ObjectId,

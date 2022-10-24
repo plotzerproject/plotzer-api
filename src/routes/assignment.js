@@ -23,10 +23,10 @@ routes.post(
   },
   verifyUserHasPermissions,
   AssignmentController.create
-);//criar
-routes.get("/", verifyPermissions, AssignmentController.get);//receber todas
-routes.get("/:id_team/data/:id", verifyUserOnTeam, AssignmentController.find);//receber dados
-routes.get("/:id_team/members/:id", verifyUserOnTeam, AssignmentController.getAssignmentUsers);//receber dados com os usuarios
+);//criar, ok
+routes.get("/", verifyPermissions, AssignmentController.get);//receber todas, ok
+routes.get("/:id_assignment", AssignmentController.find);//receber dados, ok
+routes.get("/:id_team/members/:id", verifyUserOnTeam, AssignmentController.getAssignmentUsers);//receber dados com os usuarios, ok
 routes.put(
   "/:id_team/:id",
   (req, res, next) => {
@@ -36,7 +36,7 @@ routes.put(
   },
   verifyUserHasPermissions,
   AssignmentController.update
-);//atualizar
+);//atualizar, NAO ok
 routes.delete(
   "/:id",
   (req, res, next) => {
@@ -46,14 +46,15 @@ routes.delete(
   },
   verifyUserHasPermissions,
   AssignmentController.destroy
-);
+); //NAO OK
 
-routes.get("/user/:id", verifyPermissions, AssignmentController.getUserAssignments);
-routes.get("/@me/my-assignments", AssignmentController.me, AssignmentController.getUserAssignments);
+routes.get("/user/:id", verifyPermissions, AssignmentController.getUserAssignments); //ok
+routes.get("/@me/my-assignments", AssignmentController.me, AssignmentController.getUserAssignments); //ok
 routes.post(
-  "/@me/complete-assignment",
+  "/@me/complete-assignment/:id_assignment",
   AssignmentController.me,
+  upload.array("userAttachments"),
   AssignmentController.completeAssignment
-);
+);//NAO OK
 
 export default routes;

@@ -33,7 +33,7 @@ export const getMembersReturn = (member, id_team) => {
             type_invite: member.type_invite
         },
         links: {
-            self: "/api/team/"+id_team+"/members/" + member.id
+            self: "/api/team/" + id_team + "/members/" + member.id
         }
     }
     return data
@@ -93,7 +93,7 @@ export const userSuccessReturnToken = (user, tokens) => {
 
 //team
 
-export const teamSuccessReturn = (team)=> {
+export const teamSuccessReturn = (team) => {
     const data = {
         type: "team",
         id: team.id,
@@ -128,40 +128,41 @@ export const getTeamFixed = (fixed) => {
             updatedAt: fixed.updatedAt,
         },
         links: {
-            self: "/api/team/" + fixed.id_team + "/fixed/"+fixed.id
+            self: "/api/team/" + fixed.id_team + "/fixed/" + fixed.id
         }
     }
     return data
 }
 
-export const getTeamMembers = () => {}
+export const getTeamMembers = () => { }
 
 //Assignments
 export const AssignmentReturn = (assignment) => {
-    console.log(assignment)
     const data = {
         type: "assignment",
-        id: assignment.id,
+        id: assignment._id,
         attributes: {
             title: assignment.title,
             author: assignment.author,
             description: assignment.description,
             team: assignment.team,
             dateLimit: assignment.dateLimit,
-            userAttachments: assignment.userAttachments,
+            // userAttachments: assignment.userAttachments,
             assignmentAttachments: assignment.assignmentAttachments,
             createdAt: assignment.createdAt,
             updatedAt: assignment.updatedAt,
             users: assignment.users
         },
         links: {
-            self: "/api/assignment/" + assignment.id_team
+            self: "/api/assignment/" + assignment.id
         }
     }
     return data
 }
 
 export const UserAssignmentReturn = (userAssignment) => {
+    console.log(userAssignment)
+    const index = userAssignment.userIndex
     const data = {
         type: "user-assignment",
         id: userAssignment.id,
@@ -169,7 +170,8 @@ export const UserAssignmentReturn = (userAssignment) => {
             team: userAssignment.team,
             createdAt: userAssignment.createdAt,
             updatedAt: userAssignment.updatedAt,
-
+            userAttachments: userAssignment.users[index].userAttachments,
+            status: userAssignment.users[index].status,
             assignment: {
                 id: userAssignment.assignment.id,
                 title: userAssignment.assignment.title,
@@ -177,14 +179,50 @@ export const UserAssignmentReturn = (userAssignment) => {
                 description: userAssignment.assignment.description,
                 team: userAssignment.assignment.team,
                 dateLimit: userAssignment.assignment.dateLimit,
-                userAttachments: userAssignment.assignment.userAttachments,
                 assignmentAttachments: userAssignment.assignment.assignmentAttachments,
                 createdAt: userAssignment.assignment.createdAt,
                 updatedAt: userAssignment.assignment.updatedAt,
             }
         },
         links: {
-            self: "/api/assignment/" + userAssignment.id
+            self: "/api/user/" + userAssignment.users[index].user
+        }
+    }
+    return data
+}
+
+
+//Kanban
+export const KanbanReturn = (kanban) => {
+    const data = {
+        type: "kanban",
+        id: kanban._id,
+        attributes: {
+            title: kanban.title,
+            subtitle: kanban.subtitle,
+            owner: kanban.owner,
+            tag: kanban.tag,
+            color: kanban.color,
+            isAssignment: kanban.isAssignment || false,
+            createdAt: kanban.createdAt,
+            updatedAt: kanban.updatedAt,
+            topics: kanban.topics.map((topic) => {
+                console.log(topic)
+                const data = {
+                    id: topic.id,
+                    author: topic.author,
+                    title: topic.title,
+                    content: topic.content,
+                    color: topic.color,
+                    createdAt: topic.createdAt,
+                    updatedAt: topic.updatedAt,
+                    dateLimit: kanban.isAssignment ? topic.dateLimit : undefined
+                }
+                return data
+            }            ),
+        },
+        links: {
+            self: "/api/kanban/" + kanban.id
         }
     }
     return data

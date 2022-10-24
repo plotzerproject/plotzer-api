@@ -8,6 +8,7 @@ import user from './user.js'
 import plan from './plan.js'
 import team from './team.js'
 import assignment from './assignment.js'
+import kanban from './kanban.js'
 
 //import middlewares
 import { verifyAuthentication } from '../middlewares/AuthMiddleware.js'
@@ -23,6 +24,7 @@ routes.use("/user", verifyAuthentication, user)
 routes.use("/plan", plan)
 routes.use("/team", verifyAuthentication, team)
 routes.use("/assignment", verifyAuthentication, assignment)
+routes.use("/kanban", verifyAuthentication, kanban)
 
 routes.get("/", (req, res)=>{
     res.status(200).json({data: "Welcome to Plotzer API!"})

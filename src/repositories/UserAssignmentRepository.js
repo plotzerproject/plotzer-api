@@ -1,5 +1,4 @@
 import UserAssignment from "../model/UserAssignment.js";
-import UserRepository from "./UserRepository.js";
 
 class UserAssignmentRepository{
     async create(team, assignment, users) {
@@ -25,13 +24,49 @@ class UserAssignmentRepository{
     }
     async getUserAssignments(id) {
         try {
-            const assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment")
+            let assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment")
+            assignments.forEach((assignment)=>{
+                let index = assignment?.users.findIndex((user) => {
+                    return user.user.toString() === id;
+                });
+                if (!index < 0) throw new Error("ERR_CARD_NOT_FOUND")
+                assignment.userIndex = index
+            })
             return assignments
 
         } catch (error) {
             throw new Error(error.message)
         }
     }
+
+    async verifyUserHasAssignment(id_assignment, id_user) {
+        try {
+            const assignment = await UserAssignment.findById(id_assignment)
+            if (!assignment) throw new Error("ERR_ASSIGNMENT_NOT_FOUND");
+            let index = assignment?.users.findIndex((user) => {
+                return user.user.toString() === id_user;
+            });
+            if (!index < 0) throw new Error("ERR_CARD_NOT_FOUND")
+            return {index, assignment};
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+
+    async completeAssignment(id_assignment, id_user, filesUrl) {
+        try {
+            const {index, assignment} = await this.verifyUserHasAssignment(id_assignment, id_user)
+            assignment.users[index].status = "sent"
+            assignment.users[index].userAttachments = [...assignment.users[index].userAttachments, ...filesUrl]
+            await assignment.save()
+            assignment.userIndex = index
+
+            const assignmentPopulate = assignment.populate("assignment")
+            return assignmentPopulate
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    } 
 }
 
 export default new UserAssignmentRepository()

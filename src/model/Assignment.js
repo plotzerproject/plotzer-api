@@ -11,11 +11,6 @@ const schema = new mongoose.Schema(
     },
     description: String,
     category: String,
-    userAttachments: [
-      {
-        type: String,
-      },
-    ],
     assignmentAttachments: [
       {
         type: String,

@@ -1,4 +1,5 @@
 import Assignment from "../model/Assignment.js";
+// import UserAssignmentRepository from "./UserAssignmentRepository.js";
 
 class AssignmentRepository{
     async create(title, description, category, team, author, dateLimit, assignmentAttachments) {
@@ -10,8 +11,9 @@ class AssignmentRepository{
         const assignments = await Assignment.find({})
         return assignments
     }
-    async find(id) {
-        const assignment = await Assignment.findById(id)
+    async find(req) {
+        const assignment = await Assignment.findOne(req)
+        console.log(assignment)
         return assignment
     }
     async update(id, data) {
@@ -25,11 +27,25 @@ class AssignmentRepository{
     async getAssignmentUsers(id){
         try {
             const assignments = await Assignment.findById(id).populate("users")
-            console.log(assignments)
             if(assignments == undefined) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
             if(assignments == null) throw new Error("ERR_USER_NOT_FOUND")
             // if(assignments == null) throw new Error("ERR_USER_NOT_FOUND")
             return assignments
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+    async getTeamAssignments(team) {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+    async completeAssignment(id_assignment) {
+        try {
+            // const a = UserAssignmentRepository.
         } catch (error) {
             throw new Error(error.message)
         }

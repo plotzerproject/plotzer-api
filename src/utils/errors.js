@@ -116,9 +116,22 @@ export const errDeleteAssignment = new Errors().createError("ERR_DELETE_ASSIGNME
 
 export const errAssignmentNotFound = new Errors().createError("ERR_ASSIGNMENT_NOT_FOUND", "Nenhuma tarefa foi encontrada", 404)
 
+//Kanban
+export const errCreateKanban = new Errors().createError("ERR_CREATE_KANBAN", "Um erro ocorreu ao cadastrar este kanban", 500)
+
+export const errGetKanban = new Errors().createError("ERR_GET_KANBAN", "Ocorreu um erro ao receber o(s) kanban(s)", 500)
+
+export const errUpdateKanban = new Errors().createError("ERR_UPDATE_KANBAN", "Um erro ocorreu ao editar este kanban", 500)
+
+export const errDeleteKanban = new Errors().createError("ERR_DELETE_KANBAN", "Um erro ocorreu ao deletar este kanban", 500)
+
+export const errKanbanNotFound = new Errors().createError("ERR_CARD_NOT_FOUND", "Nenhum kanban foi encontrado", 404)
+
 //Application
 export const errUnauthorized = new Errors().createError("ERR_UNAUTHORIZED", "Sem autorização!", 401)
 
 export const errApplication = new Errors().createError("ERR_APPLICATION", "Ocorreu um erro ao processar sua requisição", 500)
 
 export const errInvalidData = new Errors().createError("ERR_INVALID_DATA", "Existem campos em branco", 422)
+
+export const errFunctionNotDone = new Errors().createError("ERR_FUNCTION_NOT_DONE", "Esta função não foi concluída, avise aos colaboradores!", 500)

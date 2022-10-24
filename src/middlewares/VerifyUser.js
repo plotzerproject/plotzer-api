@@ -1,7 +1,7 @@
 import TeamRepository from "../repositories/TeamRepository.js";
 import { errActionsLikeSomeoneElse, errInvalidData, errTeamRequestFailed, errUnauthorized, errUserDoesntHavePermission, errUserIsntOnTheTeam, errUserIsntPartOfTeam } from "../utils/errors.js";
 
-const permissions = 4
+export const permissions = 4
 export const teamPermissions = {
     member: 0,
     extra: 1,

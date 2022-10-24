@@ -1,7 +1,8 @@
+import { permissions } from "../middlewares/VerifyUser.js";
 import AssignmentRepository from "../repositories/AssignmentRepository.js";
 import TeamRepository from "../repositories/TeamRepository.js";
 import UserAssignmentRepository from "../repositories/UserAssignmentRepository.js";
-import { errApplication, errAssignmentNotFound, errGetAssignment, errInvalidData, errUserNotFound } from "../utils/errors.js";
+import { errApplication, errAssignmentNotFound, errGetAssignment, errInvalidData, errUnauthorized, errUserNotFound } from "../utils/errors.js";
 import { AssignmentReturn, UserAssignmentReturn } from "../utils/returns.js";
 
 class AssignmentController {
@@ -49,13 +50,32 @@ class AssignmentController {
         }
     }
     async find(req, res, next) {
-        res.send("teste")
+        const { id_assignment } = req.params
+        if(!id_assignment) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        try {
+            const assignment = await AssignmentRepository.find({ _id: id_assignment });
+            if (assignment == null) return res.status(errAssignmentNotFound.status).json({ errors: [errAssignmentNotFound] })
+            
+            const {user} = res.locals
+            const team = user.teams.find((t)=>t == assignment.team)
+            if(team || user.applicationPermissions >= permissions) {
+                return res.status(200).json({ data: AssignmentReturn(assignment) })
+            } else {
+                return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+            }
+
+        } catch (error) {
+            console.log(error)
+            return res.status(errGetAssignment.status).json({ errors: [errGetAssignment] })
+        }
     }
     async update(req, res, next) {}
-    async destroy(req, res, next) {}
+    async destroy(req, res, next) {
+        //deletar do assignments e userAssignments
+    }
 
     async getUserAssignments(req, res, next) {
-        const id = req.params.id || res.locals.id || req.body.id
+        const id = res.locals.id || req.params.id || req.query.id
         
         if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 
@@ -66,11 +86,28 @@ class AssignmentController {
 
             return res.status(200).json({data: assignments.map(UserAssignmentReturn)})
         } catch (error) {
+            console.log(error)
             return res.status(errApplication.status).json({errors: [errApplication]})
         }
     }
     async completeAssignment(req, res, next) {
+        const {id_assignment} = req.params
 
+        const files = req.files
+        let fileUrl = []
+        if(files) {
+            files.forEach((file)=>{
+                fileUrl.push(`${process.env.SECURITY}${process.env.URL}:${process.env.PORT}/api/uploads/${file.filename}`)
+            })
+        }
+
+        try {
+            const completeUserAssignment = await UserAssignmentRepository.completeAssignment(id_assignment, res.locals.id, fileUrl)
+            return res.status(200).json({data: UserAssignmentReturn(completeUserAssignment)})
+        } catch (error) {
+            console.log(error)
+            return res.status(errApplication.status).json({errors: [errApplication]})
+        }
     }
 
     async getAssignmentUsers(req, res, next) {

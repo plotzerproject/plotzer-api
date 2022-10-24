@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
         enum: ["sent", "received", "returned"],
         default: "received"
     },
+    userAttachments: [
+        {
+          type: String,
+        },
+      ],
     completedAt: {
         type: Date,
         // default: ()=>{
