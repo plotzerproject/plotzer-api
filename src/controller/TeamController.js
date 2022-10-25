@@ -1,12 +1,16 @@
 import TeamRepository from "../repositories/TeamRepository.js";
 import UserRepository from "../repositories/UserRepository.js";
-import { errAddMemberTeam, errCreateTeam, errDeleteTeam, errGetTeam, errIncorrectData, errInvalidData, errLeaveTeam, errRemoveMemberTeam, errSlugAlreadyExists, errTeamNotFound, errTeamRequestFailed, errUnauthorized, errUpdateTeam, errUpdateUser, errUserAlreadyInvited, errUserDoesntHavePermission, errUserIsAlreadyInTheTeam, errUserIsntPartOfTeam, errUserNotFound } from "../utils/errors.js";
-import { getMembersReturn, getTeamFixed, teamSuccessReturn, userSuccessReturn } from "../utils/returns.js";
+import { errAddMemberTeam, errApplication, errCreateTeam, errDeleteTeam, errGetTeam, errIncorrectData, errInvalidData, errLeaveTeam, errRemoveMemberTeam, errRemoveOwner, errSlugAlreadyExists, errTeamNotFound, errTeamRequestFailed, errUnauthorized, errUpdateTeam, errUpdateUser, errUserAlreadyInvited, errUserDoesntHavePermission, errUserIsAlreadyInTheTeam, errUserIsntPartOfTeam, errUserNotFound } from "../utils/errors.js";
+import { getMembersReturn, getTeamFixed, getTeamInfo, getTeamMemberData, teamSuccessReturn } from "../utils/returns.js";
 import fs from 'fs'
 import multerConfig from '../config/multer.js'
 import RequestRepository from "../repositories/RequestRepository.js";
 
 class TeamController {
+    async me(req, res, next){
+        res.locals.id = res.locals.user.id;
+        next();
+    }
     async create(req, res, next) { //ok
         let { name, area, description, privacy, slug } = req.body
 
@@ -180,9 +184,37 @@ class TeamController {
 
     async destroyFixed(req, res, next) { }
 
-    async getUserStats(req, res, next) { }
+    async getUserStats(req, res, next) { 
+        const id = res.locals.id || req.params.id
+        const id_team = req.params.id_team
 
-    async getTeamStats(req, res, next) { }
+        if(!id || !id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        try {
+            const stats = await TeamRepository.getUserStats(id_team, id)
+            stats.team = id_team
+
+            return res.status(200).json({data: getTeamMemberData(stats)})
+        } catch (error) {
+            console.log(error)
+            return res.status(errApplication.status).json({errors: [ errApplication]})
+        }
+    }
+
+    async getTeamStats(req, res, next) {
+        const id_team = req.params.id_team
+
+        if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        
+        const {user} = res.locals
+        try {
+            const stats = await TeamRepository.getTeamStats(id_team, user.id)
+
+            return res.status(200).json({data: getTeamInfo(stats)})
+        } catch (error) {
+            console.log(error)
+            return res.status(errApplication.status).json({errors: [ errApplication]})
+        }
+     }
 
     async getMembers(req, res, next) { //ok - falta filtros
         const { id_team } = req.params
@@ -318,27 +350,36 @@ class TeamController {
         const { id } = req.body
         if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 
+        const {member} = res.locals
+
+
         try {
             const request = await RequestRepository.findUserTeam(id, id_team)
             const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
-            
+
             if (verifyUserAlreadyInTeam === undefined) {
                 return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
-            } else if (verifyUserAlreadyInTeam.member_active == true) {
-                const removeUser = await UserRepository.removeMember(id_team, id)
-            }     
-            const removeTeam = await TeamRepository.removeMember(id_team, id)
+            } else if (verifyUserAlreadyInTeam.type_invite == "owner") {
+                return res.status(errRemoveOwner.status).json({errors: [errRemoveOwner]})
+            } else if (verifyUserAlreadyInTeam.userPermissions < member.userPermissions) {
+                if(verifyUserAlreadyInTeam.member_active == true) {
+                    console.log(verifyUserAlreadyInTeam.userPermissions)
+                    const removeUser = await UserRepository.removeMember(id_team, id)
+                }
+                const removeTeam = await TeamRepository.removeMember(id_team, id)
 
-            const requestData = {
-                user: res.locals.user.id,
-                receiver: id,
-                team: id_team,
-                status: 'removed'
+                const requestData = {
+                    user: res.locals.user.id,
+                    receiver: id,
+                    team: id_team,
+                    status: 'removed'
+                }
+
+                const requestUpdate = RequestRepository.update(request.id, requestData)
+
+                return res.status(200).json({data: "Removido com sucesso!"})
             }
 
-            const requestUpdate = RequestRepository.update(request.id, requestData)
-
-            return res.status(200).json({data: "Removido com sucesso!"})
         } catch (error) {
             console.error(error)
             return res.status(errRemoveMemberTeam.status).json({ errors: [errRemoveMemberTeam] })
@@ -384,14 +425,30 @@ class TeamController {
             return res.status(errAddMemberTeam.status).json({ errors: [errAddMemberTeam] })
         }
     };
-    async leaveTeam(req, res, next) {
+    async leaveTeam(req, res, next) { //nao ta feito
         const { id_team } = req.params
-        const { id } = req.body
+
+        const {user} = res.locals
 
         try {
-            const user = await UserRepository.removeMember(id, id_team)
+            //validar se a pessoa for o owner, dar erro pra apagar pra facilitar, ai como proximas atualizacoes resolver isso
+            console.log(user)
+            const team = await TeamRepository.removeMember(id_team, user.id)
+            const userRemove = await UserRepository.removeMember(id_team, user.id)
 
-            return res.status(200).json({ data: userSuccessReturn(user) })
+            const requestData = {
+                user: user.id,
+                receiver: user.id,
+                team: id_team,
+                status: 'leave'
+            }
+
+            const request = RequestRepository.findUserTeam(id_team, user.id)
+
+            const requestUpdate = RequestRepository.update(request.id, requestData)
+
+            return res.status(200).json({data: "Removido com sucesso!"})
+
         } catch (error) {
             console.error(error)
             return res.status(errLeaveTeam.status).json({ errors: [errLeaveTeam] })

@@ -17,12 +17,20 @@ class AssignmentRepository{
         return assignment
     }
     async update(id, data) {
-        const assignment = await Assignment.findByIdAndUpdate(id, data)
-        return assignment
+        try {
+            const assignment = await Assignment.findByIdAndUpdate(id, data)
+            return assignment
+        } catch (error) {
+            throw new Error(error.message)
+        }
     }
     async destroy(id) {
-        const assignment = await Assignment.findByIdAndDelete(id)
-        return assignment
+        try {
+            const assignment = await Assignment.findByIdAndDelete(id)
+            return assignment
+        } catch (error) {
+            throw new Error(error.message)
+        }
     }
     async getAssignmentUsers(id){
         try {
@@ -35,11 +43,15 @@ class AssignmentRepository{
             throw new Error(error.message)
         }
     }
-    async getTeamAssignments(team) {
+    async getTeamAssignments(id_team, id_user) {
+        //repensar nesse
+        //talvez seja bom eu buscar pelo UserAssignment e de la verificar a equipe, acho que seria melhor!!
         try {
-            
+            const assignments = await Assignment.find({team: id_team}).populate("users")
+            if(assignments == null) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
+            return assignments
         } catch (error) {
-            
+            throw new Error(error.message)
         }
     }
 

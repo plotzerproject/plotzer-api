@@ -47,7 +47,7 @@ class KanbanRepository{
             let topic = kanban?.topics.findIndex((topic) => {
                 return topic.id.toString() === id_topic;
             });
-            if (!topic < 0) throw new Error("ERR_CARD_NOT_FOUND")
+            if (topic < 0) throw new Error("ERR_CARD_NOT_FOUND")
             return {topic, kanban};
         } catch (error) {
             throw new Error(error.message)

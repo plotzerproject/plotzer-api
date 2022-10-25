@@ -79,7 +79,7 @@ class UserRepository {
             let teams = user.teams.findIndex((team) => {
                 return team.toString() === id_team
             })
-            if (!teams < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if (teams < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
             user.teams.splice(teams, 1)
             await user.save()
             return user;

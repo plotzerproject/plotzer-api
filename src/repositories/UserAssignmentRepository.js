@@ -22,6 +22,17 @@ class UserAssignmentRepository{
         const assignment = await UserAssignment.findByIdAndDelete(id)
         return assignment
     }
+    async getIndex(id) {
+        console.log(id)
+        try {
+            const assignment = await UserAssignment.findOne({assignment: id})
+            if(assignment == null) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
+
+            return assignment
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
     async getUserAssignments(id) {
         try {
             let assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment")
@@ -29,8 +40,8 @@ class UserAssignmentRepository{
                 let index = assignment?.users.findIndex((user) => {
                     return user.user.toString() === id;
                 });
-                if (!index < 0) throw new Error("ERR_CARD_NOT_FOUND")
-                assignment.userIndex = index
+                // if (index < 0) throw new Error("ERR_USER_NOT_FOUND")
+                if (index >= 0) assignment.userIndex = index
             })
             return assignments
 
@@ -46,16 +57,18 @@ class UserAssignmentRepository{
             let index = assignment?.users.findIndex((user) => {
                 return user.user.toString() === id_user;
             });
-            if (!index < 0) throw new Error("ERR_CARD_NOT_FOUND")
+            if (index < 0) throw new Error("ERR_USER_NOT_FOUND")
             return {index, assignment};
         } catch (error) {
             throw new Error(error.message)
         }
     }
 
-    async completeAssignment(id_assignment, id_user, filesUrl) {
+    // async completeAssignment(id_assignment, id_user, filesUrl) {
+    async completeAssignment(index, assignment, id_user, filesUrl) {
         try {
-            const {index, assignment} = await this.verifyUserHasAssignment(id_assignment, id_user)
+            // const {index, assignment} = await this.verifyUserHasAssignment(id_assignment, id_user)
+            console.log(assignment)
             assignment.users[index].status = "sent"
             assignment.users[index].userAttachments = [...assignment.users[index].userAttachments, ...filesUrl]
             await assignment.save()

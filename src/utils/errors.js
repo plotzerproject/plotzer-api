@@ -86,6 +86,10 @@ export const errUserIsAlreadyInTheTeam = new Errors().createError("ERR_USER_IN_T
 
 export const errUserAlreadyInvited = new Errors().createError("ERR_ALREADY_INVITED", "Este usuário já foi convidado anteriormente!", 422)
 
+export const errRemoveYourself = new Errors().createError("ERR_REMOVE_YOURSELF", "Você não pode remover a si mesmo!", 401)
+
+export const errRemoveOwner = new Errors().createError("ERR_REMOVE_OWNER", "Você não pode remover o dono da equipe!", 401)
+
 // export const errUserDidntAccepted = new Errors().createError("ERR_USER_DID_NOT_ACCEPTED", "Este usuario ainda não aceitou o convite!", 422)
 
 export const errUserDoesntHavePermission = new Errors().createError("ERR_USER_PERMISSIONS", "Este usuário não possui permissão para fazer isto!", 401)

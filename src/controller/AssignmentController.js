@@ -1,8 +1,8 @@
-import { permissions } from "../middlewares/VerifyUser.js";
+import { permissions, teamPermissions } from "../middlewares/VerifyUser.js";
 import AssignmentRepository from "../repositories/AssignmentRepository.js";
 import TeamRepository from "../repositories/TeamRepository.js";
 import UserAssignmentRepository from "../repositories/UserAssignmentRepository.js";
-import { errApplication, errAssignmentNotFound, errGetAssignment, errInvalidData, errUnauthorized, errUserNotFound } from "../utils/errors.js";
+import { errApplication, errAssignmentNotFound, errDeleteAssignment, errGetAssignment, errInvalidData, errUnauthorized, errUpdateAssignment, errUserNotFound } from "../utils/errors.js";
 import { AssignmentReturn, UserAssignmentReturn } from "../utils/returns.js";
 
 class AssignmentController {
@@ -10,7 +10,7 @@ class AssignmentController {
         res.locals.id = res.locals.user.id;
         next();
       }
-    async create(req, res, next) {
+    async create(req, res, next) { //ok
         let {title, description, category, id_team, dateLimit, assignmentAttachments, users} = req.body
         const {user} = res.locals
 
@@ -41,7 +41,7 @@ class AssignmentController {
             return res.status(errApplication.status).json({errors: [errApplication]})
         }
     }
-    async get(req, res, next) {
+    async get(req, res, next) { //ok
         try {
             const assignments = await AssignmentRepository.get()
             return res.status(200).json({data: assignments.map(AssignmentReturn)})
@@ -49,7 +49,7 @@ class AssignmentController {
             return res.json(error)
         }
     }
-    async find(req, res, next) {
+    async find(req, res, next) { //ok
         const { id_assignment } = req.params
         if(!id_assignment) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
         try {
@@ -69,12 +69,39 @@ class AssignmentController {
             return res.status(errGetAssignment.status).json({ errors: [errGetAssignment] })
         }
     }
-    async update(req, res, next) {}
-    async destroy(req, res, next) {
-        //deletar do assignments e userAssignments
+    async update(req, res, next) { //ok
+        try {
+            const {assignment, id} = res.locals
+
+            const {dateLimit, assignmentAttachments, category, description, title} = req.body
+            const data = {dateLimit, assignmentAttachments, category, description, title}
+
+            const assignmentUpdate = await AssignmentRepository.update(id, data)
+            
+            return res.status(200).json({data: AssignmentReturn(assignmentUpdate)})
+        } catch (error) {
+            console.log(error)
+            return res.status(errUpdateAssignment.status).json({ errors: [errUpdateAssignment] })
+        }
     }
 
-    async getUserAssignments(req, res, next) {
+    async destroy(req, res, next) { //ok
+        try {
+            const id = res.locals.id
+            
+            const assignmentDestroy = await AssignmentRepository.destroy(id)
+            const userAssignmentDestroy = await UserAssignmentRepository.getIndex(assignmentDestroy.id)
+            await userAssignmentDestroy.delete()
+
+            return res.status(200).json({ data: "Tarefa deletada com sucesso!" })
+
+        } catch (error) {
+            console.log(error)
+            return res.status(errDeleteAssignment.status).json({ errors: [errDeleteAssignment] })
+        }
+    }
+
+    async getUserAssignments(req, res, next) { //ok
         const id = res.locals.id || req.params.id || req.query.id
         
         if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
@@ -82,7 +109,7 @@ class AssignmentController {
         try {
             const assignments = await UserAssignmentRepository.getUserAssignments(id)
             if(!assignments) return res.status(errApplication.status).json({errors: [errApplication]})
-            else if(assignments.length <= 0) return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
+            else if(assignments.length == 0) return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
 
             return res.status(200).json({data: assignments.map(UserAssignmentReturn)})
         } catch (error) {
@@ -90,27 +117,32 @@ class AssignmentController {
             return res.status(errApplication.status).json({errors: [errApplication]})
         }
     }
-    async completeAssignment(req, res, next) {
-        const {id_assignment} = req.params
-
-        const files = req.files
-        let fileUrl = []
-        if(files) {
-            files.forEach((file)=>{
-                fileUrl.push(`${process.env.SECURITY}${process.env.URL}:${process.env.PORT}/api/uploads/${file.filename}`)
-            })
-        }
+    async completeAssignment(req, res, next) { //ok
+        // const {id_assignment} = req.params
 
         try {
-            const completeUserAssignment = await UserAssignmentRepository.completeAssignment(id_assignment, res.locals.id, fileUrl)
+            const files = req.files
+            let fileUrl = []
+            if(files) {
+                files.forEach((file)=>{
+                    fileUrl.push(`${process.env.SECURITY}${process.env.URL}:${process.env.PORT}/api/uploads/${file.filename}`)
+                })
+            }
+
+            const index = res.locals.index
+            const assignment = res.locals.assignment
+            const completeUserAssignment = await UserAssignmentRepository.completeAssignment(index, assignment, res.locals.id, fileUrl)
             return res.status(200).json({data: UserAssignmentReturn(completeUserAssignment)})
         } catch (error) {
             console.log(error)
+            if(error.message == "ERR_ASSIGNMENT_NOT_FOUND") {
+                return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
+            }
             return res.status(errApplication.status).json({errors: [errApplication]})
         }
     }
 
-    async getAssignmentUsers(req, res, next) {
+    async getAssignmentUsers(req, res, next) { //ok
         const id = req.params.id
         try {
             const assignment = await AssignmentRepository.getAssignmentUsers(id)
@@ -122,6 +154,20 @@ class AssignmentController {
             } else if(error.message == "ERR_ASSIGNMENT_NOT_FOUND") {
                 return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
             }
+            return res.status(errGetAssignment.status).json({errors: [errGetAssignment]})
+        }
+    }
+
+    async getTeamAssignments(req, res, next) {
+        const {id_team} = req.params
+        const id = res.locals.id || req.params.id
+
+        if(!id_team || !id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        try {
+            const assignments = await AssignmentRepository.getTeamAssignments(id_team, id)
+            console.log(assignments)
+        } catch (error) {
+            console.log(error)
             return res.status(errGetAssignment.status).json({errors: [errGetAssignment]})
         }
     }

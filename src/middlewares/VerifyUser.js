@@ -1,5 +1,6 @@
+import AssignmentRepository from "../repositories/AssignmentRepository.js";
 import TeamRepository from "../repositories/TeamRepository.js";
-import { errActionsLikeSomeoneElse, errInvalidData, errTeamRequestFailed, errUnauthorized, errUserDoesntHavePermission, errUserIsntOnTheTeam, errUserIsntPartOfTeam } from "../utils/errors.js";
+import { errActionsLikeSomeoneElse, errAssignmentNotFound, errInvalidData, errTeamRequestFailed, errUnauthorized } from "../utils/errors.js";
 
 export const permissions = 4
 export const teamPermissions = {
@@ -37,9 +38,9 @@ const verifyPermissions = async (req, res, next) =>{
 
 const verifyUserOnTeam = async (req, res, next) => {
     const id_team = req.params.id_team || req.body.id_team;
-
+    
     if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
-
+    
     const {user} = res.locals
 
     const team = user.teams.find((t)=>t == id_team)
@@ -82,4 +83,37 @@ const verifyUserHasPermissions = async (req, res, next) => {
     }
 }
 
-export {verifyUser, verifyPermissions, verifyUserOnTeam, verifyUserHasPermissions}
+const verifyUserHasPermissionsAssignments = async (req, res, next) => {
+    const { id } = req.params
+    if (!id) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
+
+    const {user, permission, permissionApp} = res.locals
+
+    if(!permission) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+
+    try {
+        const assignment = await AssignmentRepository.find({_id: id})
+        if (assignment == null) return res.status(errAssignmentNotFound.status).json({ errors: [errAssignmentNotFound] })
+
+        const {team, member} = await TeamRepository.verifyUserTeam(assignment.team, user.id)
+        if(member.userPermissions <= permission) {
+            if(permissionApp && user.applicationPermissions <= permissions) {
+                return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+            }
+            return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+        }
+        res.locals.id = id //id do assignment
+        res.locals.team = team
+        res.locals.member = member
+        res.locals.assignment = assignment
+        next()
+    } catch (error) {
+        if(error.message == "ERR_USER_IS_NOT_PART_OF_TEAM") {
+            return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+        } else {
+            return res.status(errTeamRequestFailed.status).json({errors: [errTeamRequestFailed]})
+        }
+    }
+}
+
+export {verifyUser, verifyPermissions, verifyUserOnTeam, verifyUserHasPermissions, verifyUserHasPermissionsAssignments}

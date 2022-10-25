@@ -119,7 +119,7 @@ class TeamRepository {
             let member = team?.members.find((member) => {
                 return member.id.toString() === id_member;
             });
-            // if (!member) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if (member) throw new Error("ERR_USER_IS_NOT_TEAM")
             return member;
         } catch (error) {
             throw new Error(error.message)
@@ -133,7 +133,7 @@ class TeamRepository {
             let member = team?.members.findIndex((member) => {
                 return member.id.toString() === id_member;
             });
-            if (!member < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if (member < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
             return member;
         } catch (error) {
             throw new Error(error.message)
@@ -154,7 +154,7 @@ class TeamRepository {
         let member = team?.members.findIndex((member) => {
             return member.id.toString() === id_member;
         });
-        if (!member < 0) return undefined
+        if (member < 0) return undefined
         team.members[member].member_active = true
         await team.save();
         return team;
@@ -166,7 +166,8 @@ class TeamRepository {
             let member = team?.members.findIndex((member) => {
                 return member.id.toString() === id_member;
             });
-            if (!member < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if (member < 0) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if(team.members[member].type_invite == "owner") throw new Error("ERR_REMOVE_OWNER")
             team.members.splice(member, 1)
             await team.save()
             return team;
@@ -174,8 +175,24 @@ class TeamRepository {
             throw new Error(error.message)
         }
     }
-    async joinTeam(id_team, memberData) { }
-    async leaveTeam(id_team, id_member) { }
+
+    async getUserStats(id_team, id_user) {
+        try {
+            const {team, member} = await this.verifyUserTeam(id_team, id_user)
+            return member
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+
+    async getTeamStats(id_team, id_user) {
+        try {
+            const {team, member} = await this.verifyUserTeam(id_team, id_user)
+            return team
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
 }
 
 export default new TeamRepository();

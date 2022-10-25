@@ -134,10 +134,48 @@ export const getTeamFixed = (fixed) => {
     return data
 }
 
+export const getTeamMemberData = (member) => {
+    const returnMember = {
+        type: "member-team",
+        id: member.team,
+        attributes: {
+            tag: member.owner,
+            userPermissions: member.userPermissions,
+            reputation: member.reputation,
+            member_active: member.member_active,
+            type_invite: member.type_invite
+        },
+        links: {
+            self: "/api/assignment/" + member.team + "/"+member.id+"/stats"
+        }
+    }
+    return returnMember
+}
+
+export const getTeamInfo = (team) => {
+    const data = {
+        type: "team",
+        id: team.id,
+        attributes: {
+            name: team.name,
+            owner: team.owner,
+            plan: team.plan,
+            active: team.active,
+            stats: `${team.stats}%`,
+            slug: team.slug
+        },
+        links: {
+            self: "/api/team/" + team.id + "/stats"
+        }
+    }
+    return data
+}
+
 export const getTeamMembers = () => { }
 
 //Assignments
 export const AssignmentReturn = (assignment) => {
+    console.log(assignment)
     const data = {
         type: "assignment",
         id: assignment._id,

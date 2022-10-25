@@ -23,7 +23,7 @@ class RequestRepository {
 
     async findUserRequests(id) {}
 
-    async findUserTeam(id_user, id_team) {
+    async findUserTeam(id_team, id_user) {
         try {
             const request = await Request.findOne({receiver: id_user, team: id_team})
             return request

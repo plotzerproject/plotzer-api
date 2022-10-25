@@ -195,6 +195,10 @@ class UserController {
       return res.status(errGetTeam.status).json({ errors: [errGetTeam] });
     }
   }
+
+  async getUserStats(req, res, next) {
+    
+  }
 }
 
 export default new UserController();
