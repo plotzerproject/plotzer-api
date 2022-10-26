@@ -285,7 +285,16 @@ class TeamController {
             }
 
             const team = await TeamRepository.addMember(id_team, member_data)
-            const request = await RequestRepository.create(res.locals.user.id, id, "invited", team.id, false)
+
+            const request1 = await RequestRepository.findUserTeam(id_team, id)
+            if(request1 != null) {
+                request1.user = res.locals.user.id,
+                request1.status = "invited",
+                request1.active = false
+                await request1.save()
+            } else {
+                const request = await RequestRepository.create(res.locals.user.id, id, "invited", team.id, false)
+            }
 
             console.log("requisitado entrar na equipe")
             return res.status(201).json({ data: teamSuccessReturn(team) })
@@ -311,7 +320,7 @@ class TeamController {
             }     
             const addMemberUser = await TeamRepository.updateMember(id_team, id)
             const requestData = {
-                accepted: true
+                active: true
             }
 
             const request = await RequestRepository.find({receiver: id})
@@ -338,24 +347,34 @@ class TeamController {
     }
 
     async getRequests(req, res, next) {
+        // const {team, member, id} = res.local
+        const id = res.locals.id || res.params.id_team
+
         try {
             res.send("teste")
+            const request = await RequestRepository.findTeamRequests(id)
+            console.log(request)
         } catch (error) {
-            
+            return res.status(errApplication.status).json({errors: [ errApplication]})
         }
     }
 
     async removeMember(req, res, next) {
         const { id_team } = req.params
         const { id } = req.body
+
         if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 
         const {member} = res.locals
 
-
         try {
             const request = await RequestRepository.findUserTeam(id, id_team)
+            
+            console.log(request)
+            
             const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
+
+            console.log(verifyUserAlreadyInTeam)
 
             if (verifyUserAlreadyInTeam === undefined) {
                 return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })

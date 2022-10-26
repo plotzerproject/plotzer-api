@@ -43,17 +43,17 @@ class AssignmentRepository{
             throw new Error(error.message)
         }
     }
-    async getTeamAssignments(id_team, id_user) {
-        //repensar nesse
-        //talvez seja bom eu buscar pelo UserAssignment e de la verificar a equipe, acho que seria melhor!!
-        try {
-            const assignments = await Assignment.find({team: id_team}).populate("users")
-            if(assignments == null) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
-            return assignments
-        } catch (error) {
-            throw new Error(error.message)
-        }
-    }
+    // async getTeamAssignments(id_team, id_user) {
+    //     //repensar nesse
+    //     //talvez seja bom eu buscar pelo UserAssignment e de la verificar a equipe, acho que seria melhor!!
+    //     try {
+    //         const assignments = await Assignment.find({team: id_team}).populate("users")
+    //         if(assignments == null) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
+    //         return assignments
+    //     } catch (error) {
+    //         throw new Error(error.message)
+    //     }
+    // }
 
     async completeAssignment(id_assignment) {
         try {

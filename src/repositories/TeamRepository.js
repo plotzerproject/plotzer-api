@@ -54,7 +54,7 @@ class TeamRepository {
     async verifyUserTeam(id_team, id_user) {
         try {
             const team = await Team.findById(id_team);
-            if(team == null) {throw new Error("ERR_TEAM_DOES_NOT_EXIST")}
+            if(team == null) {throw new Error("ERR_TEAM_NOT_FOUND")}
             let member = team?.members.find((member) => {
                 return member.id.toString() === id_user;
             });
@@ -119,7 +119,7 @@ class TeamRepository {
             let member = team?.members.find((member) => {
                 return member.id.toString() === id_member;
             });
-            if (member) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if (!member) throw new Error("ERR_USER_IS_NOT_TEAM")
             return member;
         } catch (error) {
             throw new Error(error.message)

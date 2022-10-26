@@ -18,7 +18,7 @@ const schema = new mongoose.Schema({
         required: true,
         enum: ['invited', 'requested', 'friendship', 'blocked', 'removed', 'leave', 'joined']
     },
-    accepted: {
+    active: {
         type: Boolean,
         // default: false
     }

@@ -40,22 +40,23 @@ routes.put(
   },
   verifyUserHasPermissionsAssignments,
   AssignmentController.update
-);//atualizar, NAO ok
-routes.delete(
-  "/:id",
-  (req, res, next) => {
-    res.locals.permission = teamPermissions.moderator;
-    res.locals.permissionApp = false;
-    next();
-  },
-  verifyUserHasPermissionsAssignments,
-  AssignmentController.destroy
-); //NAO OK
-
-routes.get("/user/:id", verifyPermissions, AssignmentController.getUserAssignments); //ok
-routes.get("/@me/my-assignments", AssignmentController.me, AssignmentController.getUserAssignments); //ok
-
-
+  );//atualizar, NAO ok
+  routes.delete(
+    "/:id",
+    (req, res, next) => {
+      res.locals.permission = teamPermissions.moderator;
+      res.locals.permissionApp = false;
+      next();
+    },
+    verifyUserHasPermissionsAssignments,
+    AssignmentController.destroy
+    ); //NAO OK
+    
+  routes.get("/user/:id", verifyPermissions, AssignmentController.getUserAssignments); //ok
+  routes.get("/@me/my-assignments", AssignmentController.me, AssignmentController.getUserAssignments); //ok
+  
+  
+routes.get("/@me/team/:id_team/", AssignmentController.me, verifyUserOnTeam, AssignmentController.getTeamAssignments);//receber as tarefas de uma equipe em especifico, ok
 routes.post(
   "/@me/complete-assignment/:id_assignment",
   AssignmentController.me,

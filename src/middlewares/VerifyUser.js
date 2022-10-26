@@ -1,6 +1,6 @@
 import AssignmentRepository from "../repositories/AssignmentRepository.js";
 import TeamRepository from "../repositories/TeamRepository.js";
-import { errActionsLikeSomeoneElse, errAssignmentNotFound, errInvalidData, errTeamRequestFailed, errUnauthorized } from "../utils/errors.js";
+import { errActionsLikeSomeoneElse, errAssignmentNotFound, errInvalidData, errTeamNotFound, errTeamRequestFailed, errUnauthorized } from "../utils/errors.js";
 
 export const permissions = 4
 export const teamPermissions = {
@@ -75,8 +75,11 @@ const verifyUserHasPermissions = async (req, res, next) => {
         res.locals.member = member
         next()
     } catch (error) {
+        console.log(error)
         if(error.message == "ERR_USER_IS_NOT_PART_OF_TEAM") {
             return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+        } else if("ERR_TEAM_NOT_FOUND") {
+            return res.status(errTeamNotFound.status).json({errors: [errTeamNotFound]})
         } else {
             return res.status(errTeamRequestFailed.status).json({errors: [errTeamRequestFailed]})
         }

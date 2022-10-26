@@ -33,9 +33,17 @@ class UserAssignmentRepository{
             throw new Error(error.message)
         }
     }
-    async getUserAssignments(id) {
+
+    async getUserAssignments(id, team) {
         try {
-            let assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment")
+            
+            let assignments = []
+            if(team){
+                assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment").populate("team")
+            } else {
+                assignments = await UserAssignment.find({ 'users.user': id }).populate("assignment")
+            }
+
             assignments.forEach((assignment)=>{
                 let index = assignment?.users.findIndex((user) => {
                     return user.user.toString() === id;
@@ -50,9 +58,47 @@ class UserAssignmentRepository{
         }
     }
 
+    async getTeamAssignments(id_team, id_user) {
+        try {
+            let assignments = await UserAssignment.find({ 'users.user': id_user, team: id_team }).populate("assignment")
+
+            const userAssignments = assignments.filter((assignment)=>{
+                const userIndex = assignment.users.findIndex((user)=>{
+                    return user.status != 'sent' && user.user.toString() == id_user
+                })
+                if (userIndex >= 0) {
+                    assignment.userIndex = userIndex
+                    return true
+                } else {
+                    return false
+                }
+                // const userFilter = assignment.users.filter((user)=>{
+                //     const query = user.status != 'sent' && user.user.toString() == id_user
+                //     if(query) {
+                //         let index = assignment?.users.findIndex((u) => {
+                //             return u.user.toString() === id_user;
+                //         });
+                //         query.userIndex = index
+                //     }
+                //     return query
+                // })
+                // if(userFilter.length != 0) {
+                //     return true
+                // } else {
+                //     return false
+                // }
+            })
+            return userAssignments
+
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+
     async verifyUserHasAssignment(id_assignment, id_user) {
         try {
             const assignment = await UserAssignment.findById(id_assignment)
+            console.log(assignment)
             if (!assignment) throw new Error("ERR_ASSIGNMENT_NOT_FOUND");
             let index = assignment?.users.findIndex((user) => {
                 return user.user.toString() === id_user;

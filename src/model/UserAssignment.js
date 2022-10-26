@@ -18,14 +18,6 @@ const userSchema = new mongoose.Schema({
       ],
     completedAt: {
         type: Date,
-        // default: ()=>{
-        //     console.log(this.status)
-        //     if(this.status == "sent") {
-        //         return Date.now()
-        //     } else {
-        //         return null
-        //     }
-        // }
     }
 }, {
     _id: false

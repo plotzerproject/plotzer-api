@@ -107,7 +107,7 @@ class AssignmentController {
         if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 
         try {
-            const assignments = await UserAssignmentRepository.getUserAssignments(id)
+            const assignments = await UserAssignmentRepository.getUserAssignments(id, true)
             if(!assignments) return res.status(errApplication.status).json({errors: [errApplication]})
             else if(assignments.length == 0) return res.status(errAssignmentNotFound.status).json({errors: [errAssignmentNotFound]})
 
@@ -161,11 +161,12 @@ class AssignmentController {
     async getTeamAssignments(req, res, next) {
         const {id_team} = req.params
         const id = res.locals.id || req.params.id
+        console.log(id, res.locals.user.id)
 
         if(!id_team || !id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
         try {
-            const assignments = await AssignmentRepository.getTeamAssignments(id_team, id)
-            console.log(assignments)
+            const assignments = await UserAssignmentRepository.getTeamAssignments(id_team, id)
+            return res.status(200).json({data: assignments.map(UserAssignmentReturn)})
         } catch (error) {
             console.log(error)
             return res.status(errGetAssignment.status).json({errors: [errGetAssignment]})

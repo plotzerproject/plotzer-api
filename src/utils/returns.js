@@ -199,13 +199,19 @@ export const AssignmentReturn = (assignment) => {
 }
 
 export const UserAssignmentReturn = (userAssignment) => {
-    console.log(userAssignment)
     const index = userAssignment.userIndex
     const data = {
         type: "user-assignment",
         id: userAssignment.id,
         attributes: {
-            team: userAssignment.team,
+            team: typeof userAssignment.team == "object" ? {
+                id: userAssignment.team.id,
+                name: userAssignment.team.name,
+                slug: userAssignment.team.slug,
+                area: userAssignment.team.area,
+                photo: userAssignment.team.photo,
+                privacy: userAssignment.team.privacy,
+            } : userAssignment.team,
             createdAt: userAssignment.createdAt,
             updatedAt: userAssignment.updatedAt,
             userAttachments: userAssignment.users[index].userAttachments,

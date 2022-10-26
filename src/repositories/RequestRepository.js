@@ -1,8 +1,8 @@
 import Request from "../model/Request.js";
 
 class RequestRepository {
-    async create(user, receiver, status, team, accepted) {
-        const request = await Request.create({ user, receiver, status, team, accepted });
+    async create(user, receiver, status, team, active) {
+        const request = await Request.create({ user, receiver, status, team, active });
         await request.save();
         return request;
     }
@@ -26,6 +26,15 @@ class RequestRepository {
     async findUserTeam(id_team, id_user) {
         try {
             const request = await Request.findOne({receiver: id_user, team: id_team})
+            return request
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+
+    async findTeamRequests(id_team) {
+        try {
+            const request = await Request.findOne({team: id_team})
             return request
         } catch (error) {
             throw new Error(error.message)
