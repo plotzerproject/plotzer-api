@@ -42,6 +42,11 @@ class TeamRepository {
         return team;
     }
 
+    async findPopulate(req, populate) {
+        const team = await Team.findOne(req).populate(populate);
+        return team;
+    }
+
     async update(id, data) {
         const team = await Team.findByIdAndUpdate(id, data);
         return team;

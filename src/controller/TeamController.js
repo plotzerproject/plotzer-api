@@ -1,7 +1,7 @@
 import TeamRepository from "../repositories/TeamRepository.js";
 import UserRepository from "../repositories/UserRepository.js";
 import { errAddMemberTeam, errApplication, errCreateTeam, errDeleteTeam, errGetTeam, errIncorrectData, errInvalidData, errLeaveTeam, errRemoveMemberTeam, errRemoveOwner, errSlugAlreadyExists, errTeamNotFound, errTeamRequestFailed, errUnauthorized, errUpdateTeam, errUpdateUser, errUserAlreadyInvited, errUserDoesntHavePermission, errUserIsAlreadyInTheTeam, errUserIsntPartOfTeam, errUserNotFound } from "../utils/errors.js";
-import { getMembersReturn, getTeamFixed, getTeamInfo, getTeamMemberData, teamSuccessReturn } from "../utils/returns.js";
+import { getMembersReturn, getTeamFixed, getTeamInfo, getTeamMemberData, teamSuccessReturn, teamSuccessReturnFixed } from "../utils/returns.js";
 import fs from 'fs'
 import multerConfig from '../config/multer.js'
 import RequestRepository from "../repositories/RequestRepository.js";
@@ -64,11 +64,18 @@ class TeamController {
     };
     async find(req, res, next) { //ok
         const { id_team } = req.params
+        const {fixed} = req.query
         try {
-            const team = await TeamRepository.find({ _id: id_team });
-            if (team == null) return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
 
-            return res.status(200).json({ data: teamSuccessReturn(team) })
+            if(fixed) {
+                const team = await TeamRepository.findPopulate({ _id: id_team }, "fixed.author");
+                if (team == null) return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
+                return res.status(200).json({ data: teamSuccessReturnFixed(team) })
+            } else {
+                const team = await TeamRepository.find({ _id: id_team });
+                if (team == null) return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
+                return res.status(200).json({ data: teamSuccessReturn(team) })
+            }
         } catch (error) {
             console.log(error)
             return res.status(errGetTeam.status).json({ errors: [errGetTeam] })

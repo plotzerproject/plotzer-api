@@ -60,7 +60,7 @@ class UserAssignmentRepository{
 
     async getTeamAssignments(id_team, id_user) {
         try {
-            let assignments = await UserAssignment.find({ 'users.user': id_user, team: id_team }).populate("assignment")
+            let assignments = await UserAssignment.find({ 'users.user': id_user, team: id_team }).populate("assignment").populate("team")
 
             const userAssignments = assignments.filter((assignment)=>{
                 const userIndex = assignment.users.findIndex((user)=>{
@@ -111,11 +111,12 @@ class UserAssignmentRepository{
     }
 
     // async completeAssignment(id_assignment, id_user, filesUrl) {
-    async completeAssignment(index, assignment, id_user, filesUrl) {
+    async completeAssignment(index, assignment, id_user, filesUrl, completedAt) {
         try {
             // const {index, assignment} = await this.verifyUserHasAssignment(id_assignment, id_user)
             console.log(assignment)
             assignment.users[index].status = "sent"
+            assignment.users[index].completedAt = completedAt
             assignment.users[index].userAttachments = [...assignment.users[index].userAttachments, ...filesUrl]
             await assignment.save()
             assignment.userIndex = index

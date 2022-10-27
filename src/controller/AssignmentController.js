@@ -131,7 +131,8 @@ class AssignmentController {
 
             const index = res.locals.index
             const assignment = res.locals.assignment
-            const completeUserAssignment = await UserAssignmentRepository.completeAssignment(index, assignment, res.locals.id, fileUrl)
+            const completedAt = new Date()
+            const completeUserAssignment = await UserAssignmentRepository.completeAssignment(index, assignment, res.locals.id, fileUrl, completedAt)
             return res.status(200).json({data: UserAssignmentReturn(completeUserAssignment)})
         } catch (error) {
             console.log(error)

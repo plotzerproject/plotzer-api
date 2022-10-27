@@ -116,6 +116,34 @@ export const teamSuccessReturn = (team) => {
     return data
 }
 
+export const teamSuccessReturnFixed = (team) => {
+    const data = {
+        type: "team",
+        id: team.id,
+        attributes: {
+            name: team.name,
+            owner: team.owner,
+            plan: team.plan,
+            photo: team.photo,
+            background: team.background,
+            members: `GET /api/team/${team.id}/members`,
+            active: team.active,
+            stats: team.stats,
+            fixed: {
+                id: team.fixed.id,
+                author: team.fixed.author,
+                title: team.fixed.title,
+                content: team.fixed.content
+            },
+            slug: team.slug
+        },
+        links: {
+            self: "/api/team/" + team.id
+        }
+    }
+    return data
+}
+
 export const getTeamFixed = (fixed) => {
     const data = {
         type: "team-fixed",
@@ -216,6 +244,7 @@ export const UserAssignmentReturn = (userAssignment) => {
             updatedAt: userAssignment.updatedAt,
             userAttachments: userAssignment.users[index].userAttachments,
             status: userAssignment.users[index].status,
+            completedAt: userAssignment.users[index].completedAt,
             assignment: {
                 id: userAssignment.assignment.id,
                 title: userAssignment.assignment.title,
