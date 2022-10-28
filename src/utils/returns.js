@@ -203,7 +203,6 @@ export const getTeamMembers = () => { }
 
 //Assignments
 export const AssignmentReturn = (assignment) => {
-    console.log(assignment)
     const data = {
         type: "assignment",
         id: assignment._id,
@@ -269,7 +268,7 @@ export const UserAssignmentReturn = (userAssignment) => {
 export const KanbanReturn = (kanban) => {
     const data = {
         type: "kanban",
-        id: kanban._id,
+        id: kanban.id,
         attributes: {
             title: kanban.title,
             subtitle: kanban.subtitle,
@@ -280,7 +279,6 @@ export const KanbanReturn = (kanban) => {
             createdAt: kanban.createdAt,
             updatedAt: kanban.updatedAt,
             topics: kanban.topics.map((topic) => {
-                console.log(topic)
                 const data = {
                     id: topic.id,
                     author: topic.author,
@@ -289,7 +287,8 @@ export const KanbanReturn = (kanban) => {
                     color: topic.color,
                     createdAt: topic.createdAt,
                     updatedAt: topic.updatedAt,
-                    dateLimit: kanban.isAssignment ? topic.dateLimit : undefined
+                    dateLimit: kanban.isAssignment ? topic.dateLimit : undefined,
+                    isAssignment: topic.isAssignment
                 }
                 return data
             }            ),

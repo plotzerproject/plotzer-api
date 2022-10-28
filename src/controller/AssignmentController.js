@@ -162,7 +162,6 @@ class AssignmentController {
     async getTeamAssignments(req, res, next) {
         const {id_team} = req.params
         const id = res.locals.id || req.params.id
-        console.log(id, res.locals.user.id)
 
         if(!id_team || !id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
         try {

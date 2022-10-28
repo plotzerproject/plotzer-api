@@ -156,7 +156,8 @@ class KanbanController {
             // assignments = assignments.filter((assignment) => assignment.users.find((user) => {
             //     return user.status == "received";
             // }))
-            assignments = assignments.map((assignment) => (
+            assignments = assignments.map((assignment) => {
+                return (
                 {
                     id: assignment.assignment.id,
                     author: assignment.assignment.author,
@@ -164,9 +165,9 @@ class KanbanController {
                     content: assignment.assignment.description,
                     createdAt: assignment.assignment.createdAt,
                     updatedAt: assignment.assignment.updatedAt,
-                    dateLimit: assignment.assignment.dateLimit
-                }
-            ))
+                    dateLimit: assignment.assignment.dateLimit,
+                    isAssignment: true
+                })})
             const date = new Date()
             kanban.push({
                 owner: id,
