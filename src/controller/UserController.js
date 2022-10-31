@@ -44,7 +44,7 @@ class UserController {
     if (res.locals.id) id = res.locals.id;
 
     try {
-      const user = await UserRepository.find(id);
+      const user = await UserRepository.find({_id: id});
       if (user == null)
         return res
           .status(errUserNotFound.status)
@@ -79,7 +79,7 @@ class UserController {
         }
       }
       
-      const emailExists = await UserRepository.find(id)
+      const emailExists = await UserRepository.find({_id: id})
       if (email && emailExists.email == email && emailExists.id != id) {
         throw new Error("ERR_USER_EXISTS");
       }
@@ -189,7 +189,9 @@ class UserController {
           .status(errUserDontHaveATeam.status)
           .json({ errors: [errUserDontHaveATeam] });
 
-      return res.status(200).json({ data: teams.map(teamSuccessReturn) });
+      return res.status(200).json({ data: teams.map((t)=>(
+        teamSuccessReturn(t, true)
+      )) });
     } catch (error) {
       console.error(error);
       return res.status(errGetTeam.status).json({ errors: [errGetTeam] });

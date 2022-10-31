@@ -47,9 +47,10 @@ class KanbanController {
             const kanban = await KanbanRepository.create(owner, title, subtitle, topics, tag, color)
             return res.status(201).json({ data: KanbanReturn(kanban) })
         } catch (error) {
+            console.log(error)
             if (error.message == 'ERR_USER_IS_NOT_PART_OF_TEAM') {
                 return res.status(errUnauthorized.status).json({ errors: [errUnauthorized] })
-            } else if (error.message == "ERR_TEAM_DOES_NOT_EXIST") {
+            } else if (error.message == "ERR_TEAM_NOT_FOUND") {
                 return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
             }
             return res.status(errApplication.status).json({ errors: [errApplication] })
@@ -171,7 +172,7 @@ class KanbanController {
             const date = new Date()
             kanban.push({
                 owner: id,
-                title: "User to-do",
+                title: "User Assignments",
                 createdAt: date,
                 updatedAt: date,
                 isAssignment: true,
@@ -180,6 +181,28 @@ class KanbanController {
             return res.status(200).json({data: kanban.map(KanbanReturn)})
         } catch (error) {
             console.log(error)
+            return res.status(errApplication.status).json({ errors: [errApplication] })
+        }
+    }
+
+    async addTopic(req, res, next) {
+        const { id: id_user } = res.locals.user
+        const {id} = req.params
+        let { title, content, color } = req.body;
+
+        if(!id) {
+            return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        }
+        try {
+            const card = await KanbanRepository.addTopic(id, id_user, title, content, color)
+            if (card == null) return res.status(errKanbanNotFound.status).json({ errors: [errKanbanNotFound] })
+
+            return res.status(200).json({data: KanbanReturn(card)})
+        } catch (error) {
+            console.log(error)
+            if(error.message == "ERR_KANBAN_NOT_FOUND") {
+                return res.status(errKanbanNotFound.status).json({errors: [errKanbanNotFound]})
+            }
             return res.status(errApplication.status).json({ errors: [errApplication] })
         }
     }

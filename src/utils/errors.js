@@ -129,7 +129,7 @@ export const errUpdateKanban = new Errors().createError("ERR_UPDATE_KANBAN", "Um
 
 export const errDeleteKanban = new Errors().createError("ERR_DELETE_KANBAN", "Um erro ocorreu ao deletar este kanban", 500)
 
-export const errKanbanNotFound = new Errors().createError("ERR_CARD_NOT_FOUND", "Nenhum kanban foi encontrado", 404)
+export const errKanbanNotFound = new Errors().createError("ERR_KANBAN_NOT_FOUND", "Nenhum kanban foi encontrado", 404)
 
 //Application
 export const errUnauthorized = new Errors().createError("ERR_UNAUTHORIZED", "Sem autorização!", 401)

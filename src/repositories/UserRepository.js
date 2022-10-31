@@ -22,8 +22,8 @@ class UserRepository {
         const users = await User.find({})
         return users
     }
-    async find(id) {
-        const user = await User.findById(id)
+    async find(req) {
+        const user = await User.findOne(req)
         return user
     }
     async update(id, data) {

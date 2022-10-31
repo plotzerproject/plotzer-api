@@ -78,6 +78,29 @@ class KanbanRepository{
             throw new Error(error.message)
         }
     }
+
+    async verifyCardUser(id_card, id_user) {
+        try {
+            const card = await Kanban.findOne({_id: id_card, owner: id_user})
+            if(!card) throw new Error("ERR_KANBAN_NOT_FOUND")
+            return card
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+
+    async addTopic(id_card, author, title, content, color) {
+        try {
+            const kanban = await this.verifyCardUser(id_card, author)
+            const card = { author, title, content, color };
+            kanban.topics.push(card);
+            await kanban.save();
+            console.log(kanban);
+            return kanban;
+        } catch (error) {
+            throw new Error(error.message)   
+        }
+    }
 }
 
 export default new KanbanRepository()

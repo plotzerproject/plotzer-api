@@ -97,6 +97,7 @@ routes.get(
 );
 routes.post("/members/:id_team/leave", TeamController.leaveTeam)
 
+routes.get("/@me/fixed", TeamController.me, TeamController.getUserFixed)
 
 routes.get("/@me/:id_team/stats", TeamController.me, TeamController.getUserStats);
 routes.get("/:id_team/:id_user/stats", TeamController.getUserStats);

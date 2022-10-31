@@ -19,21 +19,38 @@ export const planSuccessReturn = (plan) => {
 
 //user
 
-export const getMembersReturn = (member, id_team) => {
+export const getMembersReturn = (members, team) => {
     const data = {
         type: "team members",
-        id: member.id,
+        id: team.id,
         attributes: {
-            name: member.name,
-            email: member.email,
-            tag: member.tag,
-            userPermissions: member.userPermissions,
-            reputation: member.reputation,
-            member_active: member.member_active,
-            type_invite: member.type_invite
+            name: team.name,
+            owner: team.owner,
+            plan: team.plan,
+            photo: team.photo,
+            background: team.background,
+            members: members.map((member)=>{
+                const data = {
+                    id: member.id.id,
+                    name: member.id.name,
+                    email: member.id.email,
+                    photo: member.id.photo,
+                    tag: member.tag,
+                    userPermissions: member.userPermissions,
+                    reputation: member.reputation,
+                    member_active: member.member_active,
+                    type_invite: member.type_invite,
+                }
+                return data
+            }),
+            active: team.active,
+            stats: `${team.stats}%`,
+            fixed: team.fixed,
+            slug: team.slug
         },
         links: {
-            self: "/api/team/" + id_team + "/members/" + member.id
+            self: "/api/team/" + team.id
+            // self: "/api/team/" + team.id + "/members/" + member.id
         }
     }
     return data
@@ -93,7 +110,7 @@ export const userSuccessReturnToken = (user, tokens) => {
 
 //team
 
-export const teamSuccessReturn = (team) => {
+export const teamSuccessReturn = (team, fixed) => {
     const data = {
         type: "team",
         id: team.id,
@@ -106,7 +123,7 @@ export const teamSuccessReturn = (team) => {
             members: `GET /api/team/${team.id}/members`,
             active: team.active,
             stats: `${team.stats}%`,
-            fixed: `GET /api/team/${team.id}/fixed`,
+            fixed: team.fixed,
             slug: team.slug
         },
         links: {
@@ -116,7 +133,7 @@ export const teamSuccessReturn = (team) => {
     return data
 }
 
-export const teamSuccessReturnFixed = (team) => {
+export const teamSuccessReturnFixed = (team, member) => {
     const data = {
         type: "team",
         id: team.id,
@@ -126,15 +143,27 @@ export const teamSuccessReturnFixed = (team) => {
             plan: team.plan,
             photo: team.photo,
             background: team.background,
-            members: `GET /api/team/${team.id}/members`,
+            members: member ? team.members.map((member)=>{
+                const data = {
+                    id: member.id,
+                    name: member.id.name,
+                    email: member.id.email,
+                    photo: member.id.photo,
+                    tag: member.tag,
+                    userPermissions: member.userPermissions,
+                    reputation: member.reputation,
+                    member_active: member.member_active,
+                    type_invite: member.type_invite,
+                }
+                return data
+            }) : `GET /api/team/${team.id}/members`,
             active: team.active,
             stats: team.stats,
-            fixed: {
-                id: team.fixed.id,
-                author: team.fixed.author,
-                title: team.fixed.title,
-                content: team.fixed.content
-            },
+            fixed: team.fixed ? team.fixed.sort((a, b)=>{
+                const fA = new Date(a.updatedAt)
+                const fB = new Date(b.updatedAt)
+                return fB - fA
+            }) : undefined,
             slug: team.slug
         },
         links: {
@@ -180,17 +209,34 @@ export const getTeamMemberData = (member) => {
     return returnMember
 }
 
-export const getTeamInfo = (team) => {
+export const getTeamInfo = (team, type) => {
+    console.log(team)
     const data = {
         type: "team",
-        id: team.id,
-        attributes: {
-            name: team.name,
-            owner: team.owner,
-            plan: team.plan,
-            active: team.active,
-            stats: `${team.stats}%`,
-            slug: team.slug
+        id: team.team.id,
+        attributes: type == "team" ? {
+            name: team.team.name,
+            owner: team.team.owner,
+            plan: team.team.plan,
+            active: team.team.active,
+            stats: `${team.team.stats}%`,
+            slug: team.team.slug
+        } : {
+            team: {
+                name: team.team.name,
+                owner: team.team.owner,
+                plan: team.team.plan,
+                active: team.team.active,
+                stats: `${team.team.stats}%`,
+                slug: team.team.slug
+            },
+            user: {
+                tag: team.member.owner,
+                userPermissions: team.member.userPermissions,
+                reputation: team.member.reputation,
+                member_active: team.member.member_active,
+                type_invite: team.member.type_invite
+            }
         },
         links: {
             self: "/api/team/" + team.id + "/stats"

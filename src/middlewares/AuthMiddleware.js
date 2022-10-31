@@ -19,13 +19,14 @@ const verifyAuthentication = async (req, res, next) => {
   try {
     const payload = jwt.verify(token, process.env.JWT_ACCESS_TOKEN);
     const id = payload.sub;
-    const user = await UserRepository.find(id);
+    const user = await UserRepository.find({_id: id});
     if (!user)
       return res.status(errGetUser.status).send({ errors: [errGetUser] });
     res.locals.authentication = payload;
     res.locals.user = user;
     next();
   } catch (error) {
+    console.log(error)
     if (error.message === "jwt expired") {
       return res.status(errTokenInvalid.status).json({ errors: [errTokenInvalid]});
     } else if (error.message == "jwt must be provided") {

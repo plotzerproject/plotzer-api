@@ -112,9 +112,10 @@ class TeamRepository {
     }
 
     async getMembers(id_team) {
-        const team = await Team.findById(id_team);
+        const team = await Team.findById(id_team).populate("members.id")
+        console.log(team.members[0].id)
         if (!team) return null;
-        return team.members;
+        return {team, members: team.members};
     }
 
     async getMember(id_team, id_member) {
@@ -124,7 +125,7 @@ class TeamRepository {
             let member = team?.members.find((member) => {
                 return member.id.toString() === id_member;
             });
-            if (!member) throw new Error("ERR_USER_IS_NOT_TEAM")
+            if (!member) return undefined
             return member;
         } catch (error) {
             throw new Error(error.message)
@@ -193,7 +194,7 @@ class TeamRepository {
     async getTeamStats(id_team, id_user) {
         try {
             const {team, member} = await this.verifyUserTeam(id_team, id_user)
-            return team
+            return {team, member}
         } catch (error) {
             throw new Error(error.message)
         }

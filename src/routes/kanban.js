@@ -18,4 +18,7 @@ routes.delete("/delete/:id/:idTopic", KanbanController.deleteTopic) //ok
 
 routes.get("/@me", KanbanController.me, KanbanController.getUserBoards) //ok
 
+//preciso fazer o add topic
+routes.post("/post/:id", KanbanController.addTopic)
+
 export default routes;
