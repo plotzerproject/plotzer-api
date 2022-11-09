@@ -102,7 +102,7 @@ class AuthController {
           .json({ errors: [errUserIncorrect] });
 
       //usa a lib bcrypt e verifica se a senha da requisição ao ser criptografada bate com a senha salva no mongo, caso contrario retorna que o email/senha ta incorreto
-      const checkPassword = bcrypt.compare(password, user.password);
+      const checkPassword = await bcrypt.compare(password, user.password);
       if (!checkPassword)
         return res
           .status(errUserIncorrect.status)
