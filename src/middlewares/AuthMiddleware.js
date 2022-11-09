@@ -10,6 +10,7 @@ import {
 const verifyAuthentication = async (req, res, next) => {
   const authToken =
     req.headers.authorization || req.body.token || req.query.token;
+
   if (!authToken)
     return res.status(errNeedsToken.status).json({ errors: [errNeedsToken] });
   const [, token] = authToken.split(" ");
@@ -24,6 +25,7 @@ const verifyAuthentication = async (req, res, next) => {
       return res.status(errGetUser.status).send({ errors: [errGetUser] });
     res.locals.authentication = payload;
     res.locals.user = user;
+
     next();
   } catch (error) {
     console.log(error)

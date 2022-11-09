@@ -139,3 +139,8 @@ export const errApplication = new Errors().createError("ERR_APPLICATION", "Ocorr
 export const errInvalidData = new Errors().createError("ERR_INVALID_DATA", "Existem campos em branco", 422)
 
 export const errFunctionNotDone = new Errors().createError("ERR_FUNCTION_NOT_DONE", "Esta função não foi concluída, avise aos colaboradores!", 500)
+
+//Requests
+export const errRequestNotFound = new Errors().createError("ERR_REQUEST_NOT_FOUND", "Nenhuma requisição encontrada", 404)
+
+export const errGetRequest = new Errors().createError("ERR_GET_REQUEST", "Ocorreu um erro ao receber a(s) requisições", 500)

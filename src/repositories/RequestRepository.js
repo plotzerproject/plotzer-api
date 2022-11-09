@@ -21,7 +21,15 @@ class RequestRepository {
     async destroy(id) {
     }
 
-    async findUserRequests(id) {}
+    async findUserRequests(req, populate, populate1) {
+        try {
+            const requests = await Request.find(req).populate(populate).populate(populate1)
+            // const requests = await Request.find({})
+            return requests
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
 
     async findUserTeam(id_team, id_user) {
         try {
@@ -32,9 +40,9 @@ class RequestRepository {
         }
     }
 
-    async findTeamRequests(id_team) {
+    async findTeamRequests(req, populate1, populate2, populate3) {
         try {
-            const request = await Request.findOne({team: id_team})
+            const request = await Request.find(req).populate(populate1).populate(populate2).populate(populate3)
             return request
         } catch (error) {
             throw new Error(error.message)

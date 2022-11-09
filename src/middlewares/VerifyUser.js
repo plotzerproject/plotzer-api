@@ -2,6 +2,10 @@ import AssignmentRepository from "../repositories/AssignmentRepository.js";
 import TeamRepository from "../repositories/TeamRepository.js";
 import { errActionsLikeSomeoneElse, errAssignmentNotFound, errInvalidData, errTeamNotFound, errTeamRequestFailed, errUnauthorized } from "../utils/errors.js";
 
+import { promisify } from 'util';
+const unlink = promisify(fs.unlink);
+import fs      from 'fs';
+
 export const permissions = 4
 export const teamPermissions = {
     member: 0,
@@ -55,7 +59,7 @@ const verifyUserOnTeam = async (req, res, next) => {
 }
 
 const verifyUserHasPermissions = async (req, res, next) => {
-    const id_team = req.params.id_team || req.body.id_team;
+    const id_team = req.body.id_team || req.params.id_team;
 
     if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
 
@@ -67,6 +71,39 @@ const verifyUserHasPermissions = async (req, res, next) => {
         const {team, member} = await TeamRepository.verifyUserTeam(id_team, user.id)
         if(member.userPermissions <= permission) {
             if(permissionApp && user.applicationPermissions <= permissions) {
+                return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+            }
+        }
+        res.locals.id = id_team
+        res.locals.team = team
+        res.locals.member = member
+        next()
+    } catch (error) {
+        console.log(error)
+        if(error.message == "ERR_USER_IS_NOT_PART_OF_TEAM") {
+            return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
+        } else if("ERR_TEAM_NOT_FOUND") {
+            return res.status(errTeamNotFound.status).json({errors: [errTeamNotFound]})
+        } else {
+            return res.status(errTeamRequestFailed.status).json({errors: [errTeamRequestFailed]})
+        }
+    }
+}
+
+const verifyUserHasPermissionsUpload = async (req, res, next) => {
+    const id_team = req.body.id_team || req.params.id_team;
+
+    if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+
+    const {user, permission, permissionApp} = res.locals
+
+    if(!permission) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+
+    try {
+        const {team, member} = await TeamRepository.verifyUserTeam(id_team, user.id)
+        if(member.userPermissions <= permission) {
+            if(permissionApp && user.applicationPermissions <= permissions) {
+                await Promise.all([unlink('path/doc_1'), unlink('path/doc_2')]);
                 return res.status(errUnauthorized.status).json({errors: [errUnauthorized]})
             }
         }
@@ -119,4 +156,4 @@ const verifyUserHasPermissionsAssignments = async (req, res, next) => {
     }
 }
 
-export {verifyUser, verifyPermissions, verifyUserOnTeam, verifyUserHasPermissions, verifyUserHasPermissionsAssignments}
+export {verifyUser, verifyPermissions, verifyUserOnTeam, verifyUserHasPermissions, verifyUserHasPermissionsAssignments, verifyUserHasPermissionsUpload}

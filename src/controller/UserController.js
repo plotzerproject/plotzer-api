@@ -1,9 +1,11 @@
 import UserRepository from "../repositories/UserRepository.js";
 import {
   errDeleteUser,
+  errGetRequest,
   errGetTeam,
   errGetUser,
   errInvalidData,
+  errRequestNotFound,
   errUpdateUser,
   errUserAlreadyExists,
   errUserDontHaveATeam,
@@ -12,12 +14,15 @@ import {
 
 import {
   teamSuccessReturn,
+  UserInviteRequests,
   userSuccessReturn,
+  userSuccessReturnTeams,
   userSuccessReturnToken,
 } from "../utils/returns.js";
 import { salt } from "./AuthController.js";
 import fs from 'fs'
 import multerConfig from '../config/multer.js'
+import RequestRepository from "../repositories/RequestRepository.js";
 
 class UserController {
   async me(req, res, next) { //ok
@@ -41,16 +46,22 @@ class UserController {
   async find(req, res, next) {
     //ok
     let { id } = req.params;
+    const {teams} = req.query
     if (res.locals.id) id = res.locals.id;
 
     try {
-      const user = await UserRepository.find({_id: id});
+      const user = await UserRepository.find({ _id: id });
       if (user == null)
         return res
           .status(errUserNotFound.status)
           .json({ errors: [errUserNotFound] });
 
-      return res.status(200).json({ data: userSuccessReturn(user) });
+      if(teams) {
+        return res.status(200).json({ data: userSuccessReturnTeams(user) });
+      } else {
+          return res.status(200).json({ data: userSuccessReturn(user) });
+      }
+
     } catch (error) {
       console.log(error);
       return res.status(errGetUser.status).json({ errors: [errGetUser] });
@@ -62,7 +73,7 @@ class UserController {
     // if (res.locals.id) id = res.locals.id
     const id = res.locals.id;
 
-    let { name, email, password, plan, photo, background } = req.body;
+    let { name, email, password, plan, photo, background, description, about } = req.body;
 
     try {
       const { files } = req;
@@ -78,8 +89,8 @@ class UserController {
           background = `${process.env.SECURITY}${process.env.URL}:${process.env.PORT}/api/uploads/${files.background[0].filename}`;
         }
       }
-      
-      const emailExists = await UserRepository.find({_id: id})
+
+      const emailExists = await UserRepository.find({ _id: id })
       if (email && emailExists.email == email && emailExists.id != id) {
         throw new Error("ERR_USER_EXISTS");
       }
@@ -111,6 +122,8 @@ class UserController {
         plan,
         photo,
         background,
+        description,
+        about
       };
 
       const userUpdate = await UserRepository.update(id, data);
@@ -189,9 +202,11 @@ class UserController {
           .status(errUserDontHaveATeam.status)
           .json({ errors: [errUserDontHaveATeam] });
 
-      return res.status(200).json({ data: teams.map((t)=>(
-        teamSuccessReturn(t, true)
-      )) });
+      return res.status(200).json({
+        data: teams.map((t) => (
+          teamSuccessReturn(t, true)
+        ))
+      });
     } catch (error) {
       console.error(error);
       return res.status(errGetTeam.status).json({ errors: [errGetTeam] });
@@ -199,7 +214,20 @@ class UserController {
   }
 
   async getUserStats(req, res, next) {
-    
+
+  }
+
+  async getInviteRequests(req, res, next) {
+    const id = res.locals.id || req.params.id
+
+    try {
+      const requests = await RequestRepository.findUserRequests({receiver: id, status: 'invited', active: false}, "team", "user")
+      if(requests.length == 0) return res.status(errRequestNotFound.status).json({errors: [errRequestNotFound]})
+
+      return res.status(200).json({data: requests.map(UserInviteRequests)})
+    } catch (error) {
+      return res.status(errGetRequest.status).json({errors: [errGetRequest]})
+    }
   }
 }
 

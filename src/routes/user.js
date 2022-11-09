@@ -6,8 +6,8 @@ import UserController from '../controller/UserController.js'
 
 import multer from 'multer'
 import multerConfig from '../config/multer.js'
-import { verifyPermissions, verifyUser } from '../middlewares/VerifyUser.js'
 const upload = multer(multerConfig)
+import { verifyPermissions, verifyUser } from '../middlewares/VerifyUser.js'
 
 routes.get("/get", verifyPermissions, UserController.get)
 
@@ -20,5 +20,7 @@ routes.get("/@me", UserController.me, UserController.find)
 routes.put("/@me", UserController.me, upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'background', maxCount: 1 }]), UserController.update)
 // routes.delete("/@me", UserController.me, UserController.destroy)
 routes.get("/@me/teams", UserController.me, UserController.getUserTeams)
+
+routes.get("/@me/requests", UserController.me, UserController.getInviteRequests)
 
 export default routes;

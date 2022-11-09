@@ -1,3 +1,4 @@
+import Assignment from "../model/Assignment.js";
 import UserAssignment from "../model/UserAssignment.js";
 
 class UserAssignmentRepository{
@@ -23,7 +24,6 @@ class UserAssignmentRepository{
         return assignment
     }
     async getIndex(id) {
-        console.log(id)
         try {
             const assignment = await UserAssignment.findOne({assignment: id})
             if(assignment == null) throw new Error("ERR_ASSIGNMENT_NOT_FOUND")
@@ -58,7 +58,17 @@ class UserAssignmentRepository{
         }
     }
 
-    async getTeamAssignments(id_team, id_user) {
+    async getTeamAssignments(id_team) {
+        try {
+            let assignments = await UserAssignment.find({ team: id_team }).populate("assignment")
+            return assignments
+
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
+
+    async getTeamUserAssignments(id_team, id_user) {
         try {
             let assignments = await UserAssignment.find({ 'users.user': id_user, team: id_team }).populate("assignment").populate("team")
 
@@ -97,8 +107,7 @@ class UserAssignmentRepository{
 
     async verifyUserHasAssignment(id_assignment, id_user) {
         try {
-            const assignment = await UserAssignment.findById(id_assignment)
-            console.log(assignment)
+            const assignment = await UserAssignment.findOne({assignment: id_assignment})
             if (!assignment) throw new Error("ERR_ASSIGNMENT_NOT_FOUND");
             let index = assignment?.users.findIndex((user) => {
                 return user.user.toString() === id_user;
@@ -114,7 +123,6 @@ class UserAssignmentRepository{
     async completeAssignment(index, assignment, id_user, filesUrl, completedAt) {
         try {
             // const {index, assignment} = await this.verifyUserHasAssignment(id_assignment, id_user)
-            console.log(assignment)
             assignment.users[index].status = "sent"
             assignment.users[index].completedAt = completedAt
             assignment.users[index].userAttachments = [...assignment.users[index].userAttachments, ...filesUrl]
@@ -127,6 +135,21 @@ class UserAssignmentRepository{
             throw new Error(error.message)
         }
     } 
+
+    async getAssignment(id_assignment, users) {
+        try {
+            
+            let assignment = {}
+            if(users == "populate") {
+                assignment = await UserAssignment.findOne({ assignment: id_assignment }).populate("assignment").populate("users.user")
+            } else {
+                assignment = await UserAssignment.findOne({ assignment: id_assignment }).populate("assignment")
+            }
+            return assignment
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    }
 }
 
 export default new UserAssignmentRepository()

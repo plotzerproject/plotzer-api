@@ -1,8 +1,8 @@
 import User from "../model/User.js";
 
 class UserRepository {
-    async create(name, email, password, plan, photo, background, applicationPermissions, teams) {
-        const user = await User.create({ name, email, password, plan, photo, background, teams, applicationPermissions })
+    async create(name, email, password, plan, photo, description, about, background, teams, applicationPermissions) {
+        const user = await User.create({ name, email, password, plan, photo, description, about, background, teams, applicationPermissions })
         await user.save()
         return user;
     }
@@ -23,8 +23,12 @@ class UserRepository {
         return users
     }
     async find(req) {
-        const user = await User.findOne(req)
-        return user
+        try {
+            const user = await User.findOne(req)
+            return user
+        } catch (error) {
+            throw new Error(error.message)
+        }
     }
     async update(id, data) {
         const user = await User.findByIdAndUpdate(id, data)
@@ -39,12 +43,12 @@ class UserRepository {
         // const user = await this.find(id_user)
         // User.findOne({_id: id_user})
         try {
-            const user = await User.findOne({_id: id_user})
-            if(!user) return null
-            if(!user.teams) return false
+            const user = await User.findOne({ _id: id_user })
+            if (!user) return null
+            if (!user.teams) return false
             return user.teams
         } catch (error) {
-            console.log(error)            
+            console.log(error)
         }
     }
 
@@ -52,12 +56,12 @@ class UserRepository {
         // const user = await this.find(id_user)
         // User.findOne({_id: id_user})
         try {
-            const user = await User.findOne({_id: id_user}).populate("teams")
-            if(!user) return null
-            if(!user.teams) return false
+            const user = await User.findOne({ _id: id_user }).populate("teams")
+            if (!user) return null
+            if (!user.teams) return false
             return user.teams
         } catch (error) {
-            console.log(error)            
+            console.log(error)
         }
     }
 
@@ -68,7 +72,7 @@ class UserRepository {
             await user.save()
             return user
         } catch (error) {
-            throw new Error(error.message)            
+            throw new Error(error.message)
         }
     }
 

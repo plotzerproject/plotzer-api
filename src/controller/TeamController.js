@@ -1,7 +1,7 @@
 import TeamRepository from "../repositories/TeamRepository.js";
 import UserRepository from "../repositories/UserRepository.js";
 import { errAddMemberTeam, errApplication, errCreateTeam, errDeleteTeam, errGetTeam, errIncorrectData, errInvalidData, errLeaveTeam, errRemoveMemberTeam, errRemoveOwner, errSlugAlreadyExists, errTeamNotFound, errTeamRequestFailed, errUnauthorized, errUpdateTeam, errUpdateUser, errUserAlreadyInvited, errUserDoesntHavePermission, errUserIsAlreadyInTheTeam, errUserIsntPartOfTeam, errUserNotFound } from "../utils/errors.js";
-import { getMembersReturn, getTeamFixed, getTeamInfo, getTeamMemberData, teamSuccessReturn, teamSuccessReturnFixed } from "../utils/returns.js";
+import { getMembersReturn, getTeamFixed, getTeamInfo, getTeamMemberData, TeamRequests, teamSuccessReturn, teamSuccessReturnFixed } from "../utils/returns.js";
 import fs from 'fs'
 import multerConfig from '../config/multer.js'
 import RequestRepository from "../repositories/RequestRepository.js";
@@ -354,22 +354,45 @@ class TeamController {
     }
 
     async acceptRequestTeam(req, res, next) {
-        
+        const {id_team} = req.params
+        if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+
+        const {id} = req.body
+
         try {
-            
+            const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
+            if (verifyUserAlreadyInTeam === undefined) {
+                return res.status(errUserNotFound.status).json({ errors: [errUserNotFound] })
+            } else if (verifyUserAlreadyInTeam.member_active == true) {
+                return res.status(errUserIsAlreadyInTheTeam.status).json({ errors: [errUserIsAlreadyInTheTeam] })
+            }     
+
+            const addMemberUser = await TeamRepository.updateMember(id_team, id)
+            const requestData = {
+                active: true
+            }
+
+            const request = await RequestRepository.find({receiver: id})
+
+            const updateRequest = await RequestRepository.update(request.id,requestData)
+
+            await UserRepository.addMember(id_team, id)
+
+            return res.status(201).json({data: addMemberUser})
+
         } catch (error) {
-            
+            console.log(error)
+            return res.status(errUpdateUser.status).json({errors: [errUpdateUser]})
         }
     }
 
     async getRequests(req, res, next) {
         // const {team, member, id} = res.local
-        const id = res.locals.id || res.params.id_team
+        const id_team = req.params.id_team
 
         try {
-            res.send("teste")
-            const request = await RequestRepository.findTeamRequests(id)
-            console.log(request)
+            const requests = await RequestRepository.findTeamRequests({team: id_team, status: 'requested', active: false}, "team", "user", "receiver")
+            return res.status(200).json({data: requests.map(TeamRequests)})
         } catch (error) {
             return res.status(errApplication.status).json({errors: [ errApplication]})
         }
@@ -386,11 +409,8 @@ class TeamController {
         try {
             const request = await RequestRepository.findUserTeam(id, id_team)
             
-            console.log(request)
             
             const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
-
-            console.log(verifyUserAlreadyInTeam)
 
             if (verifyUserAlreadyInTeam === undefined) {
                 return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
@@ -398,7 +418,6 @@ class TeamController {
                 return res.status(errRemoveOwner.status).json({errors: [errRemoveOwner]})
             } else if (verifyUserAlreadyInTeam.userPermissions < member.userPermissions) {
                 if(verifyUserAlreadyInTeam.member_active == true) {
-                    console.log(verifyUserAlreadyInTeam.userPermissions)
                     const removeUser = await UserRepository.removeMember(id_team, id)
                 }
                 const removeTeam = await TeamRepository.removeMember(id_team, id)
@@ -451,7 +470,7 @@ class TeamController {
 
             const team = await TeamRepository.addMember(id_team, member_data)
             // const addMemberUser = await UserRepository.addMember(id, team_data)
-            const request = await RequestRepository.create(id, user.id, "requested", id_team, false)
+            const request = await RequestRepository.create(undefined, user.id, "requested", id_team, false)
 
             return res.status(201).json({ data: "Requisitado" })
 
@@ -467,7 +486,6 @@ class TeamController {
 
         try {
             //validar se a pessoa for o owner, dar erro pra apagar pra facilitar, ai como proximas atualizacoes resolver isso
-            console.log(user)
             const team = await TeamRepository.removeMember(id_team, user.id)
             const userRemove = await UserRepository.removeMember(id_team, user.id)
 

@@ -80,7 +80,6 @@ class TeamRepository {
                 const fixed = { author: id_user, title, content };
                 team.fixed.push(fixed);
                 await team.save();
-                console.log(team);
                 return team;
             } else {
                 throw new Error("ERR_MEMBER_DOESNT_HAVE_PERMISSION");
@@ -113,7 +112,6 @@ class TeamRepository {
 
     async getMembers(id_team) {
         const team = await Team.findById(id_team).populate("members.id")
-        console.log(team.members[0].id)
         if (!team) return null;
         return {team, members: team.members};
     }

@@ -20,7 +20,7 @@ export const salt = await bcrypt.genSalt(12);
 
 class AuthController {
   async create(req, res, next) {
-    let { name, email, password, plan, photo, teams, applicationPermissions } =
+    let { name, email, password, plan, photo, teams, applicationPermissions, description, about } =
       req.body;
 
     try {
@@ -63,8 +63,10 @@ class AuthController {
         password,
         plan,
         photo,
+        description,
+        about,
         teams,
-        applicationPermissions
+        applicationPermissions,
       );
 
       //create tokens

@@ -32,6 +32,12 @@ const schema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    description: {
+      type: String
+    },
+    about: {
+      type: String
+    },
     password: {
       type: String,
     },

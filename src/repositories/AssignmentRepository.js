@@ -13,7 +13,6 @@ class AssignmentRepository{
     }
     async find(req) {
         const assignment = await Assignment.findOne(req)
-        console.log(assignment)
         return assignment
     }
     async update(id, data) {
