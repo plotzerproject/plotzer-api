@@ -1,5 +1,26 @@
 import mongoose from "mongoose";
 
+const userAttachmentSchema = new mongoose.Schema(
+    {
+      name: {
+        type: String,
+        required: true
+      },
+      url: {
+        type: String,
+        required: true
+      },
+      format: {
+        type: String,
+        required: true
+      },
+      size: {
+        type: Number,
+        required: true
+      }
+    }
+  );
+
 const userSchema = new mongoose.Schema({
     user: {
         type: mongoose.Types.ObjectId, 
@@ -11,11 +32,7 @@ const userSchema = new mongoose.Schema({
         enum: ["sent", "received", "returned"],
         default: "received"
     },
-    userAttachments: [
-        {
-          type: String,
-        },
-      ],
+    userAttachments: [userAttachmentSchema],
     completedAt: {
         type: Date,
     }

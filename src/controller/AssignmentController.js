@@ -156,7 +156,13 @@ class AssignmentController {
             let fileUrl = []
             if(files) {
                 files.forEach((file)=>{
-                    fileUrl.push(`${process.env.SECURITY}${process.env.URL}:${process.env.PORT}/api/uploads/${file.filename}`)
+                    const fileData = {
+                        url: `${process.env.SECURITY}${process.env.URL}:${process.env.PORT}/api/uploads/${file.filename}`,
+                        format: file.mimetype,
+                        name: file.originalname,
+                        size: file.size
+                    }
+                    fileUrl.push(fileData)
                 })
             }
 

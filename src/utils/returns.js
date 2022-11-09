@@ -329,7 +329,16 @@ export const TeamAssignmentReturn = (assignment) => {
             users: assignment.users.map((user) => {
                 const u = {
                     status: user.status,
-                    userAttachments: user.userAttachments,
+                    userAttachments: user.userAttachments.map((attachment) => {
+                        const data = {
+                            name: attachment.name,
+                            url: attachment.url,
+                            format: attachment.format,
+                            size: attachment.size,
+                            id: attachment.id
+                        }
+                        return data
+                    }),
                     user: {
                         id: user.user.id,
                         name: user.user.name,
@@ -384,7 +393,16 @@ export const UserAssignmentReturn = (userAssignment) => {
             } : userAssignment.team,
             createdAt: userAssignment.createdAt,
             updatedAt: userAssignment.updatedAt,
-            userAttachments: userAssignment.users[index].userAttachments,
+            userAttachments: userAssignment.users[index].userAttachments.map((attachment) => {
+                const data = {
+                    name: attachment.name,
+                    url: attachment.url,
+                    format: attachment.format,
+                    size: attachment.size,
+                    id: attachment.id
+                }
+                return data
+            }),
             status: userAssignment.users[index].status,
             completedAt: userAssignment.users[index].completedAt,
             assignment: {
@@ -493,12 +511,12 @@ export const TeamRequests = (request) => {
         type: "requests",
         id: request.id,
         attributes: {
-            user: {
+            user: request.user ? {
                 id: request.user.id,
                 name: request.user.name,
                 email: request.user.email,
                 photo: request.user.photo,
-            },
+            } : undefined,
             receiver: {
                 id: request.receiver.id,
                 name: request.receiver.name,

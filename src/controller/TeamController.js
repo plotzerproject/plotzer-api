@@ -394,6 +394,7 @@ class TeamController {
             const requests = await RequestRepository.findTeamRequests({team: id_team, status: 'requested', active: false}, "team", "user", "receiver")
             return res.status(200).json({data: requests.map(TeamRequests)})
         } catch (error) {
+            console.log(error)
             return res.status(errApplication.status).json({errors: [ errApplication]})
         }
     }

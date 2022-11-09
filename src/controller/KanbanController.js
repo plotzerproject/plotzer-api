@@ -20,25 +20,25 @@ class KanbanController {
                 if (!verifyTeam) team = undefined
             }
             if (!topics) {
-                const verifyKanban = KanbanRepository.verifyUserHasKanban(owner)
+                const verifyKanban = await KanbanRepository.verifyUserHasKanban(owner)
                 if (verifyKanban) {
                     topics = {
                         author: owner,
-                        content: "Click here to edit your kanban board",
-                        title: "Welcome to Plotzer",
+                        content: "Bem vindo novamente ao Plotzer!",
+                        title: "Clique aqui para editar",
                         color: "#CBD5E0"
                     }
                 } else {
                     topics = [
                         {
                             author: owner,
-                            content: "Here is your kanban board",
-                            title: "Welcome to Plotzer",
+                            content: "Bem vindo ao Plotzer!",
+                            title: "Aqui está seu card kanban",
                             color: "#CBD5E0"
                         },
                         {
                             author: owner,
-                            content: "Here you can take notes and organize your to-do items.",
+                            content: "Aqui você pode adicionar suas notas e organizar sua lista de afazeres",
                             color: "#FED7D7"
                         },
                     ]
