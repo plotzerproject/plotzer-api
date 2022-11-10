@@ -11,8 +11,8 @@ export const teamPermissions = {
     member: 0,
     extra: 1,
     moderator: 2,
-    supervisor: 4,
-    owner: 5
+    supervisor: 3,
+    owner: 4
 }
 
 const verifyUser = async (req, res, next) => {

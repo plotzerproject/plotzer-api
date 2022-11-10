@@ -5,9 +5,10 @@ import { getMembersReturn, getTeamFixed, getTeamInfo, getTeamMemberData, TeamReq
 import fs from 'fs'
 import multerConfig from '../config/multer.js'
 import RequestRepository from "../repositories/RequestRepository.js";
+import Request from "../model/Request.js";
 
 class TeamController {
-    async me(req, res, next){
+    async me(req, res, next) {
         res.locals.id = res.locals.user.id;
         next();
     }
@@ -29,7 +30,7 @@ class TeamController {
         const random = Math.floor(Math.random() * (15 - 1) + 1);
         const random2 = Math.floor(Math.random() * (15 - 1) + 1);
 
-        if(slug) {
+        if (slug) {
             const verifySlug = await TeamRepository.find({ slug })
             if (verifySlug && verifySlug.slug == slug) {
                 throw new Error("ERR_SLUG_EXISTS");
@@ -57,8 +58,8 @@ class TeamController {
 
             return res.status(201).json({ data: teamSuccessReturn(team) })
         } catch (error) {
-            if(error.message=="ERR_SLUG_EXISTS") {
-                return res.status(errSlugAlreadyExists.status).json({errors: [errSlugAlreadyExists]})
+            if (error.message == "ERR_SLUG_EXISTS") {
+                return res.status(errSlugAlreadyExists.status).json({ errors: [errSlugAlreadyExists] })
             }
             return res.status(errCreateTeam.status).json({ errors: [errCreateTeam] })
         }
@@ -75,10 +76,10 @@ class TeamController {
     };
     async find(req, res, next) { //ok
         const { id_team } = req.params
-        const {fixed} = req.query
+        const { fixed } = req.query
         try {
 
-            if(fixed) {
+            if (fixed) {
                 const team = await TeamRepository.findPopulate({ _id: id_team }, "fixed.author");
                 if (team == null) return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
                 return res.status(200).json({ data: teamSuccessReturnFixed(team, true) })
@@ -202,44 +203,44 @@ class TeamController {
 
     async destroyFixed(req, res, next) { }
 
-    async getUserStats(req, res, next) { 
+    async getUserStats(req, res, next) {
         const id = res.locals.id || req.params.id
         const id_team = req.params.id_team
 
-        if(!id || !id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        if (!id || !id_team) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
         try {
             const stats = await TeamRepository.getUserStats(id_team, id)
             stats.team = id_team
 
-            return res.status(200).json({data: getTeamMemberData(stats)})
+            return res.status(200).json({ data: getTeamMemberData(stats) })
         } catch (error) {
             console.log(error)
-            return res.status(errApplication.status).json({errors: [ errApplication]})
+            return res.status(errApplication.status).json({ errors: [errApplication] })
         }
     }
 
     async getTeamStats(req, res, next) {
         const id_team = req.params.id_team
 
-        if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
-        
-        const {user} = res.locals
+        if (!id_team) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
+
+        const { user } = res.locals
         try {
             const stats = await TeamRepository.getTeamStats(id_team, user.id)
 
-            return res.status(200).json({data: getTeamInfo(stats)})
+            return res.status(200).json({ data: getTeamInfo(stats) })
         } catch (error) {
             console.log(error)
-            return res.status(errApplication.status).json({errors: [ errApplication]})
+            return res.status(errApplication.status).json({ errors: [errApplication] })
         }
-     }
+    }
 
     async getMembers(req, res, next) { //ok - falta filtros
         const { id_team } = req.params
         // const {limit, filter} = req.query
         if (id_team == null) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
         try {
-            const {team, members} = await TeamRepository.getMembers(id_team);
+            const { team, members } = await TeamRepository.getMembers(id_team);
             if (members == null) return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
 
             const returnMembers = getMembersReturn(members, team)
@@ -273,8 +274,8 @@ class TeamController {
         let { email, tag, userPermissions } = req.body;
 
         try {
-            if(!email) {
-                return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+            if (!email) {
+                return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
             }
             const user = await UserRepository.find({ email: email })
             if (!user) return res.status(errUserNotFound.status).json({ errors: [errUserNotFound] })
@@ -284,7 +285,7 @@ class TeamController {
                 return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
             } else if (verifyUserAlreadyInTeam && verifyUserAlreadyInTeam.member_active == true) {
                 return res.status(errUserIsAlreadyInTheTeam.status).json({ errors: [errUserIsAlreadyInTheTeam] })
-            } else if(verifyUserAlreadyInTeam && verifyUserAlreadyInTeam.member_active == false) {
+            } else if (verifyUserAlreadyInTeam && verifyUserAlreadyInTeam.member_active == false) {
                 return res.status(errUserAlreadyInvited.status).json({ errors: [errUserAlreadyInvited] })
             }
 
@@ -303,13 +304,15 @@ class TeamController {
             const team = await TeamRepository.addMember(id_team, member_data)
 
             const request1 = await RequestRepository.findUserTeam(id_team, user.id)
-            if(request1 != null) {
+            if (request1 != null) {
                 request1.user = res.locals.user.id,
-                request1.status = "invited",
-                request1.active = false
+                    request1.status = "invited",
+                    request1.active = false
                 await request1.save()
+                console.log(request1)
             } else {
                 const request = await RequestRepository.create(res.locals.user.id, user.id, "invited", team.id, false)
+                console.log(request)
             }
 
             console.log("requisitado entrar na equipe")
@@ -322,10 +325,10 @@ class TeamController {
     };
 
     async acceptJoinTeam(req, res, next) { //ok
-        const {id_team} = req.params
-        if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        const { id_team } = req.params
+        if (!id_team) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
 
-        const {id} = res.locals.user
+        const { id } = res.locals.user
 
         try {
             const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
@@ -333,31 +336,31 @@ class TeamController {
                 return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
             } else if (verifyUserAlreadyInTeam.member_active == true) {
                 return res.status(errUserIsAlreadyInTheTeam.status).json({ errors: [errUserIsAlreadyInTheTeam] })
-            }     
+            }
             const addMemberUser = await TeamRepository.updateMember(id_team, id)
             const requestData = {
                 active: true
             }
 
-            const request = await RequestRepository.find({receiver: id})
+            const request = await RequestRepository.find({ receiver: id })
 
-            const updateRequest = await RequestRepository.update(request.id,requestData)
+            const updateRequest = await RequestRepository.update(request.id, requestData)
 
             await UserRepository.addMember(id_team, id)
 
-            return res.status(201).json({data: addMemberUser})
+            return res.status(201).json({ data: addMemberUser })
 
         } catch (error) {
             console.log(error)
-            return res.status(errUpdateUser.status).json({errors: [errUpdateUser]})
+            return res.status(errUpdateUser.status).json({ errors: [errUpdateUser] })
         }
     }
 
     async acceptRequestTeam(req, res, next) {
-        const {id_team} = req.params
-        if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        const { id_team } = req.params
+        if (!id_team) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
 
-        const {id} = req.body
+        const { id } = req.body
 
         try {
             const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
@@ -365,24 +368,24 @@ class TeamController {
                 return res.status(errUserNotFound.status).json({ errors: [errUserNotFound] })
             } else if (verifyUserAlreadyInTeam.member_active == true) {
                 return res.status(errUserIsAlreadyInTheTeam.status).json({ errors: [errUserIsAlreadyInTheTeam] })
-            }     
+            }
 
             const addMemberUser = await TeamRepository.updateMember(id_team, id)
             const requestData = {
                 active: true
             }
 
-            const request = await RequestRepository.find({receiver: id})
+            const request = await RequestRepository.find({ receiver: id })
 
-            const updateRequest = await RequestRepository.update(request.id,requestData)
+            const updateRequest = await RequestRepository.update(request.id, requestData)
 
             await UserRepository.addMember(id_team, id)
 
-            return res.status(201).json({data: addMemberUser})
+            return res.status(201).json({ data: addMemberUser })
 
         } catch (error) {
             console.log(error)
-            return res.status(errUpdateUser.status).json({errors: [errUpdateUser]})
+            return res.status(errUpdateUser.status).json({ errors: [errUpdateUser] })
         }
     }
 
@@ -391,11 +394,11 @@ class TeamController {
         const id_team = req.params.id_team
 
         try {
-            const requests = await RequestRepository.findTeamRequests({team: id_team, status: 'requested', active: false}, "team", "user", "receiver")
-            return res.status(200).json({data: requests.map(TeamRequests)})
+            const requests = await RequestRepository.findTeamRequests({ team: id_team, status: 'requested', active: false }, "team", "user", "receiver")
+            return res.status(200).json({ data: requests.map(TeamRequests) })
         } catch (error) {
             console.log(error)
-            return res.status(errApplication.status).json({errors: [ errApplication]})
+            return res.status(errApplication.status).json({ errors: [errApplication] })
         }
     }
 
@@ -403,38 +406,45 @@ class TeamController {
         const { id_team } = req.params
         const { id } = req.body
 
-        if(!id) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
+        if (!id) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
 
-        const {member} = res.locals
+        const { member } = res.locals
 
         try {
-            const request = await RequestRepository.findUserTeam(id, id_team)
-            
-            
-            const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
+            const request = await RequestRepository.findUserTeam(id_team, id)
 
-            if (verifyUserAlreadyInTeam === undefined) {
-                return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
-            } else if (verifyUserAlreadyInTeam.type_invite == "owner") {
-                return res.status(errRemoveOwner.status).json({errors: [errRemoveOwner]})
-            } else if (verifyUserAlreadyInTeam.userPermissions < member.userPermissions) {
-                if(verifyUserAlreadyInTeam.member_active == true) {
-                    const removeUser = await UserRepository.removeMember(id_team, id)
+            if(request) {
+                const verifyUserAlreadyInTeam = await TeamRepository.getMember(id_team, id)
+
+                if (verifyUserAlreadyInTeam === undefined) {
+                    return res.status(errTeamNotFound.status).json({ errors: [errTeamNotFound] })
+                } else if (verifyUserAlreadyInTeam.type_invite == "owner") {
+                    return res.status(errRemoveOwner.status).json({ errors: [errRemoveOwner] })
+                } else if (verifyUserAlreadyInTeam.userPermissions < member.userPermissions) {
+                    if (verifyUserAlreadyInTeam.member_active == true) {
+                        const removeUser = await UserRepository.removeMember(id_team, id)
+                    }
+                    const removeTeam = await TeamRepository.removeMember(id_team, id)
+    
+                    const requestData = {
+                        user: res.locals.user.id,
+                        receiver: id,
+                        team: id_team,
+                        status: 'removed'
+                    }
+    
+                    const requestUpdate = await RequestRepository.update(request.id, requestData)
+    
+                    console.log(requestUpdate, removeTeam)
+    
+                    return res.status(200).json({ data: "Removido com sucesso!" })
+                } else {
+                    return res.status(errUnauthorized.status).json({ errors: [errUnauthorized] })
                 }
-                const removeTeam = await TeamRepository.removeMember(id_team, id)
-
-                const requestData = {
-                    user: res.locals.user.id,
-                    receiver: id,
-                    team: id_team,
-                    status: 'removed'
-                }
-
-                const requestUpdate = RequestRepository.update(request.id, requestData)
-
-                return res.status(200).json({data: "Removido com sucesso!"})
+            } else {
+                return res.status(errRemoveMemberTeam.status).json({ errors: [errRemoveMemberTeam] })
             }
-
+            
         } catch (error) {
             console.error(error)
             return res.status(errRemoveMemberTeam.status).json({ errors: [errRemoveMemberTeam] })
@@ -442,10 +452,10 @@ class TeamController {
     };
     async joinTeam(req, res, next) {
         const { id_team } = req.params
-        if(!id_team) return res.status(errInvalidData.status).json({errors: [errInvalidData]})
-        
+        if (!id_team) return res.status(errInvalidData.status).json({ errors: [errInvalidData] })
+
         try {
-            const {id} = res.locals.user
+            const { id } = res.locals.user
             const user = await UserRepository.find({ _id: id })
             if (!user) return res.status(errUserNotFound.status).json({ errors: [errUserNotFound] })
 
@@ -483,7 +493,7 @@ class TeamController {
     async leaveTeam(req, res, next) { //nao ta feito
         const { id_team } = req.params
 
-        const {user} = res.locals
+        const { user } = res.locals
 
         try {
             //validar se a pessoa for o owner, dar erro pra apagar pra facilitar, ai como proximas atualizacoes resolver isso
@@ -501,7 +511,7 @@ class TeamController {
 
             const requestUpdate = RequestRepository.update(request.id, requestData)
 
-            return res.status(200).json({data: "Removido com sucesso!"})
+            return res.status(200).json({ data: "Removido com sucesso!" })
 
         } catch (error) {
             console.error(error)

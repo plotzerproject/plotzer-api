@@ -84,7 +84,7 @@ class AssignmentController {
                 assignment = await AssignmentRepository.find({ _id: id_assignment });
                 if (assignment == null) return res.status(errAssignmentNotFound.status).json({ errors: [errAssignmentNotFound] })
                 const {user} = res.locals
-                const team = user.teams.find((t)=>t == assignment.team)
+                const team = user.teams.find((t)=>t.toString() == assignment.team.toString())
                 if(team || user.applicationPermissions >= permissions) {
                     return res.status(200).json({ data: AssignmentReturn(assignment) })
                 } else {
