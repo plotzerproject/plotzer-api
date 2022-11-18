@@ -12,7 +12,10 @@ export default {
         filename(request, file, callback) {
             const fileHash = crypto.randomBytes(10).toString('hex')
 
+            // console.log(file.originalname)
+            
             const fileOriginal = file.originalname.split(" ").join("%20")
+            // console.log(fileOriginal)
             const filename = `${fileHash}-${fileOriginal}`;
 
             return callback(null, filename)
